@@ -1,5 +1,5 @@
 package org.roborace;
 
 public enum Type {
-    COMMAND, STATE, REGISTER, TIME, LAPS, LAP, ERROR
+    COMMAND, STATE, ROBOT_INIT, ROBOT_EDIT, TIME, LAPS, LAP, ERROR
 }

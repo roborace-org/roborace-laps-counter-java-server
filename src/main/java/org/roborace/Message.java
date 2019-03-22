@@ -20,6 +20,8 @@ public class Message {
 
     private Integer serial;
 
+    private String name;
+
     private Integer millis;
 
 }
