@@ -13,17 +13,14 @@ import lombok.*;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Message {
-    private Type type;
+public class Robot {
 
-    private State state;
-
-    private Integer serial;
+    private int serial;
 
     private String name;
 
-    private Long millis;
-
-    private String message;
+    private int place;
+    private int laps;
+    private int time;
 
 }

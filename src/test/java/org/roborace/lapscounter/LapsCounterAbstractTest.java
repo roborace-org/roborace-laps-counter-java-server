@@ -6,10 +6,11 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.State;
 import org.roborace.lapscounter.domain.Type;
-import org.roborace.lapscounter.client.WebsocketClient;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.websocket.DeploymentException;
 import java.io.IOException;
@@ -25,8 +26,11 @@ import static org.roborace.lapscounter.domain.State.READY;
 
 abstract class LapsCounterAbstractTest {
 
-    private static final String WS_SERVER = "ws://192.168.1.200:8888/";
-    protected static final int TIME_SEND_INTERVAL = 10_000;
+    @Value("${local.server.port}")
+    private int port;
+
+    private static final String WS_SERVER = "ws://localhost:%d/";
+    protected static final long TIME_SEND_INTERVAL = 10_000L;
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,7 +61,8 @@ abstract class LapsCounterAbstractTest {
 
     protected WebsocketClient createClient(String name) {
         try {
-            return new WebsocketClient(new URI(WS_SERVER), name);
+            String scheme = String.format(WS_SERVER, port);
+            return new WebsocketClient(new URI(scheme), name);
         } catch (IOException | DeploymentException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

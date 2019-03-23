@@ -3,8 +3,9 @@ package org.roborace.lapscounter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.roborace.lapscounter.domain.Type;
 import org.roborace.lapscounter.client.WebsocketClient;
+import org.roborace.lapscounter.domain.Type;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Random;
@@ -14,11 +15,9 @@ import java.util.stream.IntStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.roborace.lapscounter.domain.Message.builder;
-import static org.roborace.lapscounter.domain.State.FINISH;
-import static org.roborace.lapscounter.domain.State.READY;
-import static org.roborace.lapscounter.domain.State.RUNNING;
-import static org.roborace.lapscounter.domain.State.STEADY;
+import static org.roborace.lapscounter.domain.State.*;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LapsCounterRobotTest extends LapsCounterAbstractTest {
 
     private static final int MAX_ROBOTS = 8;
