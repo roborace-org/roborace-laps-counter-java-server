@@ -1,8 +1,10 @@
-package org.roborace;
+package org.roborace.lapscounter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.roborace.lapscounter.domain.Type;
+import org.roborace.lapscounter.client.WebsocketClient;
 
 import java.util.List;
 import java.util.Random;
@@ -11,11 +13,11 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.roborace.Message.builder;
-import static org.roborace.State.FINISH;
-import static org.roborace.State.READY;
-import static org.roborace.State.RUNNING;
-import static org.roborace.State.STEADY;
+import static org.roborace.lapscounter.domain.Message.builder;
+import static org.roborace.lapscounter.domain.State.FINISH;
+import static org.roborace.lapscounter.domain.State.READY;
+import static org.roborace.lapscounter.domain.State.RUNNING;
+import static org.roborace.lapscounter.domain.State.STEADY;
 
 class LapsCounterRobotTest extends LapsCounterAbstractTest {
 

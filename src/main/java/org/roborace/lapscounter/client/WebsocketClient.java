@@ -1,6 +1,8 @@
-package org.roborace;
+package org.roborace.lapscounter.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.roborace.lapscounter.domain.Message;
+import org.roborace.lapscounter.domain.Type;
 
 import javax.websocket.*;
 import java.io.IOException;

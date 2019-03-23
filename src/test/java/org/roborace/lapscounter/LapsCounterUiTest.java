@@ -1,14 +1,16 @@
-package org.roborace;
+package org.roborace.lapscounter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.roborace.lapscounter.domain.Message;
+import org.roborace.lapscounter.domain.Type;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.roborace.State.*;
+import static org.roborace.lapscounter.domain.State.*;
 
 class LapsCounterUiTest extends LapsCounterAbstractTest {
 

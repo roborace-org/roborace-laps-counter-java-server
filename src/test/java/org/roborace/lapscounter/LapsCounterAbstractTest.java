@@ -1,4 +1,4 @@
-package org.roborace;
+package org.roborace.lapscounter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,10 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.roborace.lapscounter.domain.Message;
+import org.roborace.lapscounter.domain.State;
+import org.roborace.lapscounter.domain.Type;
+import org.roborace.lapscounter.client.WebsocketClient;
 
 import javax.websocket.DeploymentException;
 import java.io.IOException;
@@ -17,7 +21,7 @@ import static org.awaitility.Duration.FIVE_SECONDS;
 import static org.awaitility.Duration.ONE_MILLISECOND;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.roborace.State.READY;
+import static org.roborace.lapscounter.domain.State.READY;
 
 abstract class LapsCounterAbstractTest {
 
