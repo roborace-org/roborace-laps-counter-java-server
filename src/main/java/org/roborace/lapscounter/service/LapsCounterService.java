@@ -7,6 +7,7 @@ import org.roborace.lapscounter.domain.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,7 +26,10 @@ public class LapsCounterService {
     private List<Robot> robots = new ArrayList<>();
 
     @Autowired
-    RoboraceWebSocketHandler webSocketHandler;
+    private RoboraceWebSocketHandler webSocketHandler;
+
+    @Value("${laps.safe-interval}")
+    private long safeInterval;
 
     public void handleMessage(Message message) {
 
@@ -45,9 +49,7 @@ public class LapsCounterService {
             case TIME:
                 break;
             case LAPS:
-                for (Robot robot : robots) {
-                    webSocketHandler.broadcast(getLap(robot));
-                }
+                laps();
                 break;
             case LAP:
                 break;
@@ -76,13 +78,16 @@ public class LapsCounterService {
             webSocketHandler.broadcast(error);
             return;
         }
-        if (parsedState != this.state) {
-            this.state = parsedState;
+        if (parsedState != state) {
+            state = parsedState;
             webSocketHandler.broadcast(getState());
-            if (this.state == State.RUNNING) {
+            if (state == State.STEADY) {
+                robots.forEach(this::resetRobot);
+                laps();
+            } else if (state == State.RUNNING) {
                 stopwatch.start();
                 webSocketHandler.broadcast(getTime());
-            } else if (this.state == State.FINISH) {
+            } else if (state == State.FINISH) {
                 stopwatch.finish();
                 webSocketHandler.broadcast(getTime());
             }
@@ -98,6 +103,7 @@ public class LapsCounterService {
         } else {
             robot = new Robot();
             robot.setSerial(message.getSerial());
+            resetRobot(robot);
             robots.add(robot);
             LOG.info("Connect new robot {}", robot);
         }
@@ -112,10 +118,32 @@ public class LapsCounterService {
         webSocketHandler.broadcast(getLap(robot));
     }
 
+    private void resetRobot(Robot robot) {
+        robot.setLaps(0);
+        robot.setLastLapMillis(-60_000L);
+    }
+
+    private void laps() {
+        for (Robot robot : robots) {
+            webSocketHandler.broadcast(getLap(robot));
+        }
+    }
+
     private void frame(Message message) {
+        if (state != State.RUNNING) {
+            LOG.info("Frame ignored: state is not running");
+            return;
+        }
         Robot robot = getRobotOrElseThrow(message.getSerial());
-        robot.incLaps();
-        webSocketHandler.broadcast(getLap(robot));
+        if (stopwatch.getTime() > robot.getLastLapMillis() + safeInterval) {
+            robot.incLaps();
+            robot.setLastLapMillis(stopwatch.getTime());
+            LOG.info("Frame is counted: {}", robot);
+            webSocketHandler.broadcast(getLap(robot));
+        } else {
+            LOG.warn("Frame is not counted (too quick): {}", robot);
+        }
+
     }
 
     public Message getState() {

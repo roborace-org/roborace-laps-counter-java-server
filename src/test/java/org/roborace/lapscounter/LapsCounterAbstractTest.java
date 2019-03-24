@@ -87,6 +87,10 @@ abstract class LapsCounterAbstractTest {
             sendCommandAndCheckState(READY);
         }
     }
+    protected void givenRunningState() {
+        sendCommandAndCheckState(State.STEADY);
+        sendCommandAndCheckState(State.RUNNING);
+    }
 
 
     protected void sendCommandAndCheckState(State state) {

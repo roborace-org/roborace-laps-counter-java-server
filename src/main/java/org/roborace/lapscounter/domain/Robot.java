@@ -23,6 +23,8 @@ public class Robot {
     private int laps;
     private int time;
 
+    private long lastLapMillis;
+
     public void incLaps() {
         laps++;
     }

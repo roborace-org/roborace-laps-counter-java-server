@@ -1,2 +1,5 @@
 server:
   port: 8888
+
+laps:
+  safe-interval: 5000
