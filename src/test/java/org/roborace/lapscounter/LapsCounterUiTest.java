@@ -3,19 +3,22 @@ package org.roborace.lapscounter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 import static org.roborace.lapscounter.domain.State.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LapsCounterUiTest extends LapsCounterAbstractTest {
-
 
     @BeforeEach
     void setUp() {
@@ -116,11 +119,29 @@ class LapsCounterUiTest extends LapsCounterAbstractTest {
     @Test
     void testLaps() {
 
-        sendMessage(ui, buildWithType(Type.LAPS));
+        WebsocketClient robot1 = createAndInitRobot("ROBOT1", FIRST_SERIAL);
+        assertThat(ui.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(robot1.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
+        await().until(() -> !robot1.hasMessage());
 
-//        await().until(() -> ui.hasMessageWithType(Type.LAP));
+
+        WebsocketClient robot2 = createAndInitRobot("ROBOT2", SECOND_SERIAL);
+        assertThat(ui.getLastMessage().getSerial(), equalTo(SECOND_SERIAL));
+        assertThat(robot2.getLastMessage().getSerial(), equalTo(SECOND_SERIAL));
+//        shouldHasNoMessage(robot1); // TODO should not receive this
+
+        Set<Integer> serials = new HashSet<>(Arrays.asList(FIRST_SERIAL, SECOND_SERIAL));
+        sendMessage(ui, buildWithType(Type.LAPS));
+        await().until(() -> {
+            shouldReceiveType(ui, Type.LAP);
+            System.out.println("serials = " + serials);
+            System.out.println("ui.getLastMessage().getSerial() = " + ui.getLastMessage().getSerial());
+            assertThat(serials, hasItem(ui.getLastMessage().getSerial()));
+            serials.remove(ui.getLastMessage().getSerial());
+            return serials.isEmpty();
+        });
+
 
     }
-
 
 }

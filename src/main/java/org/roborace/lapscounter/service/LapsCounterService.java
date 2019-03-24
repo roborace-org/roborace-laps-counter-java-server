@@ -96,8 +96,9 @@ public class LapsCounterService {
             robot = new Robot();
             robot.setSerial(message.getSerial());
             robots.add(robot);
+            LOG.info("Connect new robot {}", robot);
         }
-        LOG.info("robots = " + robots);
+        LOG.info("Connected robots: {}", robots);
         webSocketHandler.broadcast(getLap(robot));
     }
 

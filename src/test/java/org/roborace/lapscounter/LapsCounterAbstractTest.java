@@ -22,9 +22,13 @@ import static org.awaitility.Duration.FIVE_SECONDS;
 import static org.awaitility.Duration.ONE_MILLISECOND;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.roborace.lapscounter.domain.Message.builder;
 import static org.roborace.lapscounter.domain.State.READY;
 
 abstract class LapsCounterAbstractTest {
+
+    protected static final int FIRST_SERIAL = 100;
+    protected static final int SECOND_SERIAL = 101;
 
     @Value("${local.server.port}")
     private int port;
@@ -66,6 +70,15 @@ abstract class LapsCounterAbstractTest {
         } catch (IOException | DeploymentException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected WebsocketClient createAndInitRobot(String name, int serial) {
+        WebsocketClient robot = createClient(name);
+        shouldReceiveState(robot, READY);
+        sendMessage(robot, builder().type(Type.ROBOT_INIT).serial(serial).build());
+        await().until(() -> ui.hasMessageWithType(Type.LAP));
+        await().until(() -> robot.hasMessageWithType(Type.LAP));
+        return robot;
     }
 
     private void givenReadyState() {
