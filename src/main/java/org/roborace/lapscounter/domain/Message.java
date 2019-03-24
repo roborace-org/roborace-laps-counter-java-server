@@ -19,9 +19,11 @@ public class Message {
     private State state;
 
     private Integer serial;
+    private Integer frame;
 
     private String name;
 
+    private Integer laps;
     private Long millis;
 
     private String message;

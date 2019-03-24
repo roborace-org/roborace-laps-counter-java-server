@@ -51,6 +51,9 @@ public class LapsCounterService {
                 break;
             case LAP:
                 break;
+            case FRAME:
+                frame(message);
+                break;
             case ERROR:
                 break;
         }
@@ -103,14 +106,16 @@ public class LapsCounterService {
     }
 
     private void robotEdit(Message message) {
-        Optional<Robot> existing = getRobot(message.getSerial());
-        Robot robot;
-        if (existing.isPresent()) {
-            LOG.info("Reconnect robot {}", existing.get());
-            robot = existing.get();
-            robot.setName(message.getName());
-            webSocketHandler.broadcast(getLap(robot));
-        }
+        Robot robot = getRobotOrElseThrow(message.getSerial());
+        LOG.info("Reconnect robot {}", robot);
+        robot.setName(message.getName());
+        webSocketHandler.broadcast(getLap(robot));
+    }
+
+    private void frame(Message message) {
+        Robot robot = getRobotOrElseThrow(message.getSerial());
+        robot.incLaps();
+        webSocketHandler.broadcast(getLap(robot));
     }
 
     public Message getState() {
@@ -132,8 +137,15 @@ public class LapsCounterService {
         message.setType(Type.LAP);
         message.setSerial(robot.getSerial());
         message.setName(robot.getName());
+        message.setLaps(robot.getLaps());
         message.setMillis(stopwatch.getTime());
         return message;
+    }
+
+    private Robot getRobotOrElseThrow(Integer serial) {
+        return Optional.ofNullable(serial)
+                .flatMap(this::getRobot)
+                .orElseThrow(() -> new RuntimeException("Cannot find robot by serial"));
     }
 
     private Optional<Robot> getRobot(Integer serial) {

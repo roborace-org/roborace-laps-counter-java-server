@@ -120,8 +120,9 @@ abstract class LapsCounterAbstractTest {
         assertThat(client.getLastMessage().getState(), equalTo(state));
     }
 
-    protected void shouldReceiveType(WebsocketClient client, Type type) {
+    protected Message shouldReceiveType(WebsocketClient client, Type type) {
         await().until(() -> client.hasMessageWithType(type));
+        return client.getLastMessage();
     }
 
 }
