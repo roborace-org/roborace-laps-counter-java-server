@@ -19,6 +19,7 @@ public class Robot {
 
     private String name;
 
+    private int num;
     private int place;
     private int laps;
     private int time;

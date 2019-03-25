@@ -55,11 +55,26 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
         assertFalse(robot1.hasMessageWithType(Type.LAP));
 
     }
-
     @Test
-    void testFrameSimple() {
+    void testFrameIgnoredFirstSeconds() throws InterruptedException {
+
         givenRunningState();
 
+        await().until(() -> robot1.hasMessageWithType(Type.LAP));
+
+        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
+
+        Thread.sleep(safeInterval);
+
+        assertFalse(robot1.hasMessageWithType(Type.LAP));
+
+    }
+
+    @Test
+    void testFrameSimple() throws InterruptedException {
+        givenRunningState();
+
+        Thread.sleep(safeInterval);
         sendFrame(robot1, FIRST_SERIAL, 0xAA00);
         await().untilAsserted(() -> {
             Message lastMessage = shouldReceiveType(robot1, Type.LAP);
@@ -67,12 +82,15 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
             assertThat(lastMessage.getLaps(), equalTo(1));
         });
 
+        shouldReceiveType(ui, Type.LAP);
+
     }
 
     @Test
     void testFrameOneRobot_RotateNotCounted() throws InterruptedException {
         givenRunningState();
 
+        Thread.sleep(safeInterval);
         sendFrame(robot1, FIRST_SERIAL, 0xAA00);
         await().untilAsserted(() -> {
             Message lastMessage = shouldReceiveType(robot1, Type.LAP);
@@ -91,6 +109,8 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
     @Test
     void testFrameOneRobotSeveralLaps() throws InterruptedException {
         givenRunningState();
+
+        Thread.sleep(safeInterval);
 
         AtomicInteger laps = new AtomicInteger(0);
         for (int i = 0; i < 3; i++) {

@@ -81,16 +81,16 @@ class LapsCounterUiTest extends LapsCounterAbstractTest {
         sendCommandAndCheckState(RUNNING);
 
         shouldReceiveType(ui, Type.TIME);
-        assertThat(ui.getLastMessage().getMillis(), lessThan(100L));
+        assertThat(ui.getLastMessage().getTime(), lessThan(100L));
 
         Thread.sleep(TIME_SEND_INTERVAL);
         shouldReceiveType(ui, Type.TIME);
-//        assertThat(ui.getLastMessage().getMillis(), equalTo(TIME_SEND_INTERVAL));
+//        assertThat(ui.getLastMessage().getTime(), equalTo(TIME_SEND_INTERVAL));
 
         sendCommandAndCheckState(FINISH);
         shouldReceiveType(ui, Type.TIME);
-        assertThat(ui.getLastMessage().getMillis(), greaterThan(TIME_SEND_INTERVAL));
-        assertThat(ui.getLastMessage().getMillis(), lessThan(TIME_SEND_INTERVAL + 500));
+        assertThat(ui.getLastMessage().getTime(), greaterThan(TIME_SEND_INTERVAL));
+        assertThat(ui.getLastMessage().getTime(), lessThan(TIME_SEND_INTERVAL + 500));
 
     }
 

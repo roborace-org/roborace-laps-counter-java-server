@@ -77,7 +77,6 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     @Scheduled(fixedRate = 10000)
     private void sendMessage() {
-        LOG.info("Send time");
-        broadcast(lapsCounterService.getTime());
+        lapsCounterService.scheduled();
     }
 }

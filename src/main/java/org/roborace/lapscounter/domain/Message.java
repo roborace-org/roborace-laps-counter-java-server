@@ -23,8 +23,9 @@ public class Message {
 
     private String name;
 
+    private Integer num;
     private Integer laps;
-    private Long millis;
+    private Long time;
 
     private String message;
 

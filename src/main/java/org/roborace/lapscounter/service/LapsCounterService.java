@@ -103,6 +103,7 @@ public class LapsCounterService {
         } else {
             robot = new Robot();
             robot.setSerial(message.getSerial());
+            robot.setNum(robots.size() + 1);
             resetRobot(robot);
             robots.add(robot);
             LOG.info("Connect new robot {}", robot);
@@ -120,7 +121,7 @@ public class LapsCounterService {
 
     private void resetRobot(Robot robot) {
         robot.setLaps(0);
-        robot.setLastLapMillis(-60_000L);
+        robot.setLastLapMillis(0);
     }
 
     private void laps() {
@@ -146,6 +147,13 @@ public class LapsCounterService {
 
     }
 
+    public void scheduled() {
+        if (state == State.RUNNING) {
+            LOG.info("Send time");
+            webSocketHandler.broadcast(getTime());
+        }
+    }
+
     public Message getState() {
         Message message = new Message();
         message.setType(Type.STATE);
@@ -156,7 +164,7 @@ public class LapsCounterService {
     public Message getTime() {
         Message message = new Message();
         message.setType(Type.TIME);
-        message.setMillis(stopwatch.getTime());
+        message.setTime(stopwatch.getTime());
         return message;
     }
 
@@ -165,8 +173,9 @@ public class LapsCounterService {
         message.setType(Type.LAP);
         message.setSerial(robot.getSerial());
         message.setName(robot.getName());
+        message.setNum(robot.getNum());
         message.setLaps(robot.getLaps());
-        message.setMillis(stopwatch.getTime());
+        message.setTime(robot.getLastLapMillis());
         return message;
     }
 
