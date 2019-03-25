@@ -107,6 +107,7 @@ public class LapsCounterService {
             robot.setNum(robots.size() + 1);
             resetRobot(robot);
             robots.add(robot);
+            frameProcessor.robotInit(robot);
             LOG.info("Connect new robot {}", robot);
         }
         LOG.info("Connected robots: {}", robots);
@@ -138,8 +139,8 @@ public class LapsCounterService {
         }
         Robot robot = getRobotOrElseThrow(message.getSerial());
 
-        boolean lapCounted = frameProcessor.checkFrame(robot, message.getFrame(), stopwatch.getTime());
-        if (lapCounted) {
+        Type frameType = frameProcessor.checkFrame(robot, message.getFrame(), stopwatch.getTime());
+        if (frameType == Type.LAP) {
             webSocketHandler.broadcast(getLap(robot));
         }
 

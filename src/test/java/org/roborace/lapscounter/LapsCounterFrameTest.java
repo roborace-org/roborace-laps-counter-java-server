@@ -17,8 +17,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.roborace.lapscounter.domain.Message.builder;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=1000")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=300")
 class LapsCounterFrameTest extends LapsCounterAbstractTest {
+
+    private static final int FRAME_0 = 0xAA00;
+    private static final int FRAME_1 = 0xAA01;
+    private static final int FRAME_2 = 0xAA02;
 
     @Value("${laps.safe-interval}")
     private long safeInterval;
@@ -48,13 +52,14 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
 
         await().until(() -> robot1.hasMessageWithType(Type.LAP));
 
-        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
+        sendAllFrames();
 
         Thread.sleep(safeInterval);
 
         assertFalse(robot1.hasMessageWithType(Type.LAP));
 
     }
+
     @Test
     void testFrameIgnoredFirstSeconds() throws InterruptedException {
 
@@ -62,7 +67,9 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
 
         await().until(() -> robot1.hasMessageWithType(Type.LAP));
 
-        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_1);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_2);
 
         Thread.sleep(safeInterval);
 
@@ -74,8 +81,8 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
     void testFrameSimple() throws InterruptedException {
         givenRunningState();
 
-        Thread.sleep(safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
+        sendAllFrames();
+
         await().untilAsserted(() -> {
             Message lastMessage = shouldReceiveType(robot1, Type.LAP);
             assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
@@ -87,43 +94,32 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
     }
 
     @Test
-    void testFrameOneRobot_RotateNotCounted() throws InterruptedException {
-        givenRunningState();
-
-        Thread.sleep(safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
-        await().untilAsserted(() -> {
-            Message lastMessage = shouldReceiveType(robot1, Type.LAP);
-            assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
-            assertThat(lastMessage.getLaps(), equalTo(1));
-        });
-
-        sendFrame(robot1, FIRST_SERIAL, 0xAA00);
-
-        Thread.sleep(safeInterval);
-
-        assertFalse(robot1.hasMessageWithType(Type.LAP));
-
-    }
-
-    @Test
     void testFrameOneRobotSeveralLaps() throws InterruptedException {
         givenRunningState();
 
-        Thread.sleep(safeInterval);
-
         AtomicInteger laps = new AtomicInteger(0);
         for (int i = 0; i < 3; i++) {
-            sendFrame(robot1, FIRST_SERIAL, 0xAA00);
+            sendAllFrames();
+
             laps.incrementAndGet();
+
             await().untilAsserted(() -> {
                 Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+                System.out.println("lastMessage = " + lastMessage);
                 assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
                 assertThat(lastMessage.getLaps(), equalTo(laps.get()));
             });
-            Thread.sleep(safeInterval);
         }
 
+    }
+
+    private void sendAllFrames() throws InterruptedException {
+        Thread.sleep(safeInterval);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
+        Thread.sleep(safeInterval);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_1);
+        Thread.sleep(safeInterval);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_2);
     }
 
     private void sendFrame(WebsocketClient robot, int serial, int frame) {
