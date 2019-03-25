@@ -7,7 +7,6 @@ import org.roborace.lapscounter.domain.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,15 +20,16 @@ public class LapsCounterService {
     private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
     private State state = State.STEADY;
-    private Stopwatch stopwatch = new Stopwatch();
+    private final Stopwatch stopwatch = new Stopwatch();
 
-    private List<Robot> robots = new ArrayList<>();
+    private final List<Robot> robots = new ArrayList<>();
 
     @Autowired
     private RoboraceWebSocketHandler webSocketHandler;
 
-    @Value("${laps.safe-interval}")
-    private long safeInterval;
+    @Autowired
+    private FrameProcessor frameProcessor;
+
 
     public void handleMessage(Message message) {
 
@@ -83,6 +83,7 @@ public class LapsCounterService {
             webSocketHandler.broadcast(getState());
             if (state == State.STEADY) {
                 robots.forEach(this::resetRobot);
+                frameProcessor.reset();
                 laps();
             } else if (state == State.RUNNING) {
                 stopwatch.start();
@@ -121,7 +122,7 @@ public class LapsCounterService {
 
     private void resetRobot(Robot robot) {
         robot.setLaps(0);
-        robot.setLastLapMillis(0);
+        robot.setTime(0);
     }
 
     private void laps() {
@@ -136,13 +137,10 @@ public class LapsCounterService {
             return;
         }
         Robot robot = getRobotOrElseThrow(message.getSerial());
-        if (stopwatch.getTime() > robot.getLastLapMillis() + safeInterval) {
-            robot.incLaps();
-            robot.setLastLapMillis(stopwatch.getTime());
-            LOG.info("Frame is counted: {}", robot);
+
+        boolean lapCounted = frameProcessor.checkFrame(robot, message.getFrame(), stopwatch.getTime());
+        if (lapCounted) {
             webSocketHandler.broadcast(getLap(robot));
-        } else {
-            LOG.warn("Frame is not counted (too quick): {}", robot);
         }
 
     }
@@ -175,7 +173,7 @@ public class LapsCounterService {
         message.setName(robot.getName());
         message.setNum(robot.getNum());
         message.setLaps(robot.getLaps());
-        message.setTime(robot.getLastLapMillis());
+        message.setTime(robot.getTime());
         return message;
     }
 

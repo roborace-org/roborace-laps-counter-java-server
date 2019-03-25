@@ -22,9 +22,7 @@ public class Robot {
     private int num;
     private int place;
     private int laps;
-    private int time;
-
-    private long lastLapMillis;
+    private long time;
 
     public void incLaps() {
         laps++;
