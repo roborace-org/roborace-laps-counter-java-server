@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,12 +18,20 @@ public class FrameProcessor {
     private final Map<Integer, Long> lastFrameTimeBySerialMap = new HashMap<>();
 
     private final long safeInterval;
+    private final List<Integer> frames;
 
-    public FrameProcessor(@Value("${laps.safe-interval}") long safeInterval) {
+    public FrameProcessor(@Value("${laps.safe-interval}") long safeInterval,
+                          @Value("${laps.frames}") List<Integer> frames) {
         this.safeInterval = safeInterval;
+        this.frames = frames;
     }
 
     public boolean checkFrame(Robot robot, Integer frame, long raceTime) {
+
+        if (!frames.contains(frame)) {
+            LOG.warn("Frame not found: {}", frame);
+            return false;
+        }
 
         int serial = robot.getSerial();
         Long lastLapTime = lastFrameTimeBySerialMap.getOrDefault(serial, 0L);

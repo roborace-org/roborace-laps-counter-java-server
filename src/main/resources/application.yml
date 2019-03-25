@@ -3,3 +3,4 @@ server:
 
 laps:
   safe-interval: 5000
+  frames: 0xAA00
