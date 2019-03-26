@@ -7,6 +7,7 @@ import org.roborace.lapscounter.domain.Robot;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.roborace.lapscounter.domain.Type.*;
@@ -108,7 +109,7 @@ class FrameProcessorTest {
     }
 
     @Test
-    void testTwoRobots() {
+    void testLapsTwoRobots() {
         Robot robot2 = Robot.builder().serial(70).build();
         frameProcessor.robotInit(robot2);
 
@@ -127,5 +128,17 @@ class FrameProcessorTest {
 
         assertThat(robot.getTime(), equalTo(5100L));
         assertThat(robot2.getTime(), equalTo(4100L));
+    }
+
+    @Test
+    void testLapsOneFrame() {
+        frameProcessor = new FrameProcessor(1000, singletonList(FRAME_0));
+        frameProcessor.robotInit(robot);
+
+        assertThat(frameProcessor.checkFrame(robot, FRAME_1, 1000), equalTo(ERROR));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 1000), equalTo(LAP));
+
+        assertThat(robot.getLaps(), equalTo(1));
+        assertThat(robot.getTime(), equalTo(1000L));
     }
 }
