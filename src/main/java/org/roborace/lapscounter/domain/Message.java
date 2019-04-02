@@ -29,4 +29,7 @@ public class Message {
 
     private String message;
 
+    public Message(Type type) {
+        this.type = type;
+    }
 }

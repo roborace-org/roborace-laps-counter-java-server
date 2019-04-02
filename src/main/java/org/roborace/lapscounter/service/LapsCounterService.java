@@ -1,9 +1,6 @@
 package org.roborace.lapscounter.service;
 
-import org.roborace.lapscounter.domain.Message;
-import org.roborace.lapscounter.domain.Robot;
-import org.roborace.lapscounter.domain.State;
-import org.roborace.lapscounter.domain.Type;
+import org.roborace.lapscounter.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.roborace.lapscounter.domain.State.*;
 
 
 @Service
@@ -19,88 +19,81 @@ public class LapsCounterService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
-    private State state = State.STEADY;
+    private State state = STEADY;
     private final Stopwatch stopwatch = new Stopwatch();
     private final List<Robot> robots = new ArrayList<>();
 
-    private final RoboraceWebSocketHandler webSocketHandler;
     private final FrameProcessor frameProcessor;
 
     @Autowired
-    public LapsCounterService(RoboraceWebSocketHandler webSocketHandler, FrameProcessor frameProcessor) {
-        this.webSocketHandler = webSocketHandler;
+    public LapsCounterService(FrameProcessor frameProcessor) {
         this.frameProcessor = frameProcessor;
     }
 
 
-    public void handleMessage(Message message) {
+    public MessageResult handleMessage(Message message) {
 
         switch (message.getType()) {
             case COMMAND:
-                command(message);
-                break;
+                return command(message);
             case STATE:
-                webSocketHandler.broadcast(getState());
-                break;
+                return MessageResult.single(getState());
             case ROBOT_INIT:
-                robotInit(message);
-                break;
+                return robotInit(message);
             case ROBOT_EDIT:
-                robotEdit(message);
-                break;
+                return robotEdit(message);
             case TIME:
-                break;
+                return MessageResult.single(getTime());
             case LAPS:
-                laps();
-                break;
+                return new MessageResult(getLapMessages(), ResponseType.SINGLE);
             case LAP:
-                break;
+                throw new LapsCounterException("Method not supported");
             case LAP_MAN:
-                lapManual(message);
-                break;
+                return lapManual(message);
             case FRAME:
-                frame(message);
-                break;
+                return frame(message);
             case ERROR:
-                break;
+                throw new LapsCounterException("Method not supported");
+            default:
+                return null;
         }
-
     }
 
-    private void command(Message message) {
+    private MessageResult command(Message message) {
         State parsedState = message.getState();
         if (parsedState == null) {
-            webSocketHandler.broadcast(Message.builder().type(Type.ERROR).build());
-            return;
+            throw new LapsCounterException("State is null");
         }
-        if ((parsedState == State.STEADY && state != State.READY)
-                || (parsedState == State.RUNNING && state != State.STEADY)
-                || (parsedState == State.FINISH && state != State.RUNNING)) {
-            Message error = Message.builder()
-                    .type(Type.ERROR)
-                    .message("Wrong current state to apply command")
-                    .build();
-            webSocketHandler.broadcast(error);
-            return;
+        if ((parsedState == STEADY && state != READY)
+                || (parsedState == RUNNING && state != STEADY)
+                || (parsedState == FINISH && state != RUNNING)) {
+            throw new LapsCounterException("Wrong current state to apply command");
         }
+
+        MessageResult messageResult = new MessageResult(new ArrayList<>(), ResponseType.BROADCAST);
         if (parsedState != state) {
             state = parsedState;
-            webSocketHandler.broadcast(getState());
-            if (state == State.STEADY) {
-                robots.forEach(this::resetRobot);
-                frameProcessor.reset();
-                laps();
-            } else if (state == State.RUNNING) {
-                stopwatch.start();
-                webSocketHandler.broadcast(getTime());
-            } else if (state == State.FINISH) {
-                stopwatch.finish();
-                webSocketHandler.broadcast(getTime());
+            messageResult.add(getState());
+            switch (state) {
+                case STEADY:
+                    robots.forEach(Robot::reset);
+                    frameProcessor.reset();
+                    messageResult.addAll(getLapMessages());
+                    break;
+                case RUNNING:
+                    stopwatch.start();
+                    messageResult.add(getTime());
+                    break;
+                case FINISH:
+                    stopwatch.finish();
+                    messageResult.add(getTime());
+                    break;
             }
         }
+        return messageResult;
     }
 
-    private void robotInit(Message message) {
+    private MessageResult robotInit(Message message) {
         Optional<Robot> existing = getRobot(message.getSerial());
         Robot robot;
         if (existing.isPresent()) {
@@ -111,48 +104,41 @@ public class LapsCounterService {
             robot.setSerial(message.getSerial());
             robot.setNum(robots.size() + 1);
             robot.setPlace(robots.size() + 1);
-            resetRobot(robot);
+            robot.reset();
             robots.add(robot);
             frameProcessor.robotInit(robot);
             LOG.info("Connect new robot {}", robot);
         }
         LOG.info("Connected robots: {}", robots);
-        webSocketHandler.broadcast(getLap(robot));
+        return MessageResult.broadcast(getLap(robot));
     }
 
-    private void robotEdit(Message message) {
+    private MessageResult robotEdit(Message message) {
         Robot robot = getRobotOrElseThrow(message.getSerial());
-        LOG.info("Reconnect robot {}", robot);
+        LOG.info("Edit robot {}", robot);
         robot.setName(message.getName());
-        webSocketHandler.broadcast(getLap(robot));
+        return MessageResult.broadcast(getLap(robot));
     }
 
-    private void resetRobot(Robot robot) {
-        robot.setLaps(0);
-        robot.setTime(0);
-    }
-
-    private void laps() {
-        for (Robot robot : robots) {
-            webSocketHandler.broadcast(getLap(robot));
-        }
-    }
-
-    private void lapManual(Message message) {
-        if (state != State.RUNNING) {
+    private MessageResult lapManual(Message message) {
+        if (state != RUNNING) {
             LOG.info("Lap manual ignored: state is not running");
-            return;
+            throw new LapsCounterException("Lap manual ignored: state is not running");
         }
+
         Robot robot = getRobotOrElseThrow(message.getSerial());
         if (message.getLaps() > 0) {
             incLaps(robot, stopwatch.getTime());
+        } else {
+            robot.decLaps(); // TODO restore time
         }
+        return MessageResult.broadcast(getLap(robot));
     }
 
-    private void frame(Message message) {
-        if (state != State.RUNNING) {
+    private MessageResult frame(Message message) {
+        if (state != RUNNING) {
             LOG.info("Frame ignored: state is not running");
-            return;
+            return null;
         }
         Robot robot = getRobotOrElseThrow(message.getSerial());
 
@@ -160,21 +146,30 @@ public class LapsCounterService {
         Type frameType = frameProcessor.checkFrame(robot, message.getFrame(), raceTime);
         if (frameType == Type.LAP) {
             incLaps(robot, raceTime);
+            return MessageResult.broadcast(getLap(robot));
+        } else if (frameType == Type.FRAME) {
+            return MessageResult.single(new Message(Type.FRAME));
         }
-
+        return null;
     }
 
     private void incLaps(Robot robot, long raceTime) {
         robot.incLaps();
         robot.setTime(raceTime);
-        webSocketHandler.broadcast(getLap(robot));
     }
 
-    public void scheduled() {
-        if (state == State.RUNNING) {
+    private List<Message> getLapMessages() {
+        return robots.stream()
+                .map(this::getLap)
+                .collect(Collectors.toList());
+    }
+
+    public Message scheduled() {
+        if (state == RUNNING) {
             LOG.info("Send time");
-            webSocketHandler.broadcast(getTime());
+            return getTime();
         }
+        return null;
     }
 
     public Message getState() {
@@ -205,7 +200,7 @@ public class LapsCounterService {
     private Robot getRobotOrElseThrow(Integer serial) {
         return Optional.ofNullable(serial)
                 .flatMap(this::getRobot)
-                .orElseThrow(() -> new RuntimeException("Cannot find robot by serial"));
+                .orElseThrow(() -> new LapsCounterException("Cannot find robot by serial"));
     }
 
     private Optional<Robot> getRobot(Integer serial) {

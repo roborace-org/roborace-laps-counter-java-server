@@ -1,7 +1,5 @@
 package org.roborace.lapscounter.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Getter
@@ -11,8 +9,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Robot {
 
     private int serial;
@@ -26,5 +22,14 @@ public class Robot {
 
     public void incLaps() {
         laps++;
+    }
+
+    public void decLaps() {
+        laps--;
+    }
+
+    public void reset() {
+        laps = 0;
+        time = 0;
     }
 }
