@@ -122,12 +122,6 @@ class FrameProcessorTest {
         assertThat(frameProcessor.checkFrame(robot2, FRAME_1, 3100), equalTo(FRAME));
         assertThat(frameProcessor.checkFrame(robot2, FRAME_2, 4100), equalTo(LAP));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 5100), equalTo(LAP));
-
-        assertThat(robot.getLaps(), equalTo(1));
-        assertThat(robot2.getLaps(), equalTo(1));
-
-        assertThat(robot.getTime(), equalTo(5100L));
-        assertThat(robot2.getTime(), equalTo(4100L));
     }
 
     @Test
@@ -137,8 +131,5 @@ class FrameProcessorTest {
 
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 1000), equalTo(ERROR));
         assertThat(frameProcessor.checkFrame(robot, FRAME_0, 1000), equalTo(LAP));
-
-        assertThat(robot.getLaps(), equalTo(1));
-        assertThat(robot.getTime(), equalTo(1000L));
     }
 }

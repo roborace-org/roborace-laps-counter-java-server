@@ -55,8 +55,6 @@ public class FrameProcessor {
         frameRobotInfo.updateInfo(raceTime, frame);
 
         if (allFrames(frameRobotInfo.getFrames())) {
-            robot.incLaps();
-            robot.setTime(raceTime);
             LOG.info("Lap is counted: {}", robot);
             return Type.LAP;
         }

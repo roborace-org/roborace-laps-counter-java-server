@@ -55,6 +55,9 @@ public class LapsCounterService {
                 break;
             case LAP:
                 break;
+            case LAP_MAN:
+                lapManual(message);
+                break;
             case FRAME:
                 frame(message);
                 break;
@@ -135,6 +138,17 @@ public class LapsCounterService {
         }
     }
 
+    private void lapManual(Message message) {
+        if (state != State.RUNNING) {
+            LOG.info("Lap manual ignored: state is not running");
+            return;
+        }
+        Robot robot = getRobotOrElseThrow(message.getSerial());
+        if (message.getLaps() > 0) {
+            incLaps(robot, stopwatch.getTime());
+        }
+    }
+
     private void frame(Message message) {
         if (state != State.RUNNING) {
             LOG.info("Frame ignored: state is not running");
@@ -142,11 +156,18 @@ public class LapsCounterService {
         }
         Robot robot = getRobotOrElseThrow(message.getSerial());
 
-        Type frameType = frameProcessor.checkFrame(robot, message.getFrame(), stopwatch.getTime());
+        long raceTime = stopwatch.getTime();
+        Type frameType = frameProcessor.checkFrame(robot, message.getFrame(), raceTime);
         if (frameType == Type.LAP) {
-            webSocketHandler.broadcast(getLap(robot));
+            incLaps(robot, raceTime);
         }
 
+    }
+
+    private void incLaps(Robot robot, long raceTime) {
+        robot.incLaps();
+        robot.setTime(raceTime);
+        webSocketHandler.broadcast(getLap(robot));
     }
 
     public void scheduled() {
