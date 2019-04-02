@@ -7,28 +7,30 @@ import org.roborace.lapscounter.domain.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 
-@Component
+@Service
 public class LapsCounterService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
     private State state = State.STEADY;
     private final Stopwatch stopwatch = new Stopwatch();
-
     private final List<Robot> robots = new ArrayList<>();
 
-    @Autowired
-    private RoboraceWebSocketHandler webSocketHandler;
+    private final RoboraceWebSocketHandler webSocketHandler;
+    private final FrameProcessor frameProcessor;
 
     @Autowired
-    private FrameProcessor frameProcessor;
+    public LapsCounterService(RoboraceWebSocketHandler webSocketHandler, FrameProcessor frameProcessor) {
+        this.webSocketHandler = webSocketHandler;
+        this.frameProcessor = frameProcessor;
+    }
 
 
     public void handleMessage(Message message) {
@@ -105,6 +107,7 @@ public class LapsCounterService {
             robot = new Robot();
             robot.setSerial(message.getSerial());
             robot.setNum(robots.size() + 1);
+            robot.setPlace(robots.size() + 1);
             resetRobot(robot);
             robots.add(robot);
             frameProcessor.robotInit(robot);
