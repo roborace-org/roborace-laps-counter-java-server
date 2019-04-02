@@ -2,6 +2,7 @@ package org.roborace.lapscounter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.roborace.lapscounter.domain.Message;
+import org.roborace.lapscounter.domain.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,17 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws IOException {
-        String payload = textMessage.getPayload();
-        LOG.info("handleTextMessage {} {}", session.getRemoteAddress(), payload);
-        Message message = JSON.readValue(payload, Message.class);
-        lapsCounterService.handleMessage(message);
+        try {
+            String payload = textMessage.getPayload();
+            LOG.info("handleTextMessage {} {}", session.getRemoteAddress(), payload);
+            Message message = JSON.readValue(payload, Message.class);
+            lapsCounterService.handleMessage(message);
+        } catch (Exception e) {
+            if (session.isOpen()) {
+                Message message = Message.builder().type(Type.ERROR).message(e.getMessage()).build();
+                sendMessage(message, session);
+            }
+        }
     }
 
     public void broadcast(Message message) {
@@ -76,7 +84,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Scheduled(fixedRate = 10000)
-    private void sendMessage() {
+    private void scheduled() {
         lapsCounterService.scheduled();
     }
 }
