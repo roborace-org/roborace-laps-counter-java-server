@@ -32,6 +32,10 @@ public class FrameProcessor {
         frameInfoBySerialMap.put(robot.getSerial(), new FrameRobotInfo());
     }
 
+    public void reset() {
+        frameInfoBySerialMap.values().forEach(FrameRobotInfo::reset);
+    }
+
     public Type checkFrame(Robot robot, Integer frame, long raceTime) {
 
         if (!frames.contains(frame)) {
@@ -79,9 +83,5 @@ public class FrameProcessor {
 
     private boolean isTooQuick(long raceTime, long lastFrameTime) {
         return raceTime < lastFrameTime + safeInterval;
-    }
-
-    public void reset() {
-        frameInfoBySerialMap.values().forEach(FrameRobotInfo::reset);
     }
 }
