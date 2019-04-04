@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FrameRobotInfo {
-    private List<Integer> frames = new ArrayList<>();
+    private final List<Integer> frames = new ArrayList<>();
     private long lastFrameTime;
 
     public void updateInfo(long raceTime, Integer frame) {

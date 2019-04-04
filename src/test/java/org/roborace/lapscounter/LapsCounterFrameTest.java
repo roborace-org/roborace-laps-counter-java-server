@@ -8,6 +8,7 @@ import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.roborace.lapscounter.domain.Message.builder;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=300")
 class LapsCounterFrameTest extends LapsCounterAbstractTest {
 

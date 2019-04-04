@@ -7,6 +7,7 @@ import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.roborace.lapscounter.domain.State.*;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LapsCounterUiTest extends LapsCounterAbstractTest {
 
@@ -44,10 +46,6 @@ class LapsCounterUiTest extends LapsCounterAbstractTest {
 
     @Test
     void testRestart() {
-
-        sendCommandAndCheckState(STEADY);
-
-        sendCommandAndCheckState(READY);
 
         sendCommandAndCheckState(STEADY);
 

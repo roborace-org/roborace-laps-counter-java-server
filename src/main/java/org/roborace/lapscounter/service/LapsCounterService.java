@@ -64,7 +64,7 @@ public class LapsCounterService {
         if (parsedState == null) {
             throw new LapsCounterException("State is null");
         }
-        if (state == parsedState || parsedState.ordinal() != state.ordinal() + 1) {
+        if (!isCorrectCommand(parsedState)) {
             throw new LapsCounterException("Wrong current state to apply command: [" + state + "]->[" + parsedState + "]");
         }
 
@@ -89,6 +89,12 @@ public class LapsCounterService {
             }
         }
         return messageResult;
+    }
+
+    private boolean isCorrectCommand(State newState) {
+        if (newState.ordinal() == state.ordinal() + 1) return true;
+        if (newState.ordinal() == 0 && state.ordinal() == values().length - 1) return true;
+        return false;
     }
 
     private MessageResult robotInit(Message message) {
