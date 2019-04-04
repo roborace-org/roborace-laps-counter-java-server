@@ -2,6 +2,7 @@ package org.roborace.lapscounter.service;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,41 +51,33 @@ class LapsCounterServiceTest {
         List<Message> messages = messageResult.getMessages();
         assertThat(messages, Matchers.hasSize(1));
 
-        assertThatMessageHasState(messages.get(0), State.STEADY);
+        assertThatMessageHasState(messages.get(0), State.READY);
     }
 
     @Test
-    void testCommandReady() {
-        Message command = aCommand(State.READY);
+    void testCommandSteady() {
+        Message command = aCommand(State.STEADY);
         MessageResult messageResult = lapsCounterService.handleMessage(command);
 
         assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
         List<Message> messages = messageResult.getMessages();
         assertThat(messages, Matchers.hasSize(1));
 
-        assertThatMessageHasState(messages.get(0), State.READY);
-    }
-
-    @Test
-    void testCommandSteadySimple() {
-        lapsCounterService.handleMessage(aCommand(State.READY));
-
-        Message commandSteady = aCommand(State.STEADY);
-        MessageResult messageResult = lapsCounterService.handleMessage(commandSteady);
-
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
-
         assertThatMessageHasState(messages.get(0), State.STEADY);
-
         Mockito.verify(frameProcessor).reset();
     }
 
     @Test
+    void testSameCommandException() {
+        Assertions.assertThrows(LapsCounterException.class, () -> {
+            Message command = aCommand(State.READY);
+            lapsCounterService.handleMessage(command);
+        });
+    }
+
+    @Test
     void testCommandRunning() {
-        lapsCounterService.handleMessage(aCommand(State.READY));
-        lapsCounterService.handleMessage(aCommand(State.STEADY));
+        givenRaceState(State.STEADY);
 
         Message commandGo = aCommand(State.RUNNING);
         MessageResult messageResult = lapsCounterService.handleMessage(commandGo);
@@ -100,9 +94,7 @@ class LapsCounterServiceTest {
 
     @Test
     void testCommandFinish() {
-        lapsCounterService.handleMessage(aCommand(State.READY));
-        lapsCounterService.handleMessage(aCommand(State.STEADY));
-        lapsCounterService.handleMessage(aCommand(State.RUNNING));
+        givenRaceState(State.RUNNING);
 
         Message commandFinish = aCommand(State.FINISH);
         MessageResult messageResult = lapsCounterService.handleMessage(commandFinish);
@@ -134,7 +126,7 @@ class LapsCounterServiceTest {
 
     @Test
     void testSecondRobotInit() {
-        lapsCounterService.handleMessage(Message.builder().type(Type.ROBOT_INIT).serial(101).build());
+        givenRobotInits(101);
 
         Message secondRobotInit = Message.builder().type(Type.ROBOT_INIT).serial(102).build();
         MessageResult messageResult = lapsCounterService.handleMessage(secondRobotInit);
@@ -151,7 +143,7 @@ class LapsCounterServiceTest {
 
     @Test
     void testRobotEdit() {
-        lapsCounterService.handleMessage(Message.builder().type(Type.ROBOT_INIT).serial(101).build());
+        givenRobotInits(101);
 
         Message robotEdit = Message.builder().type(Type.ROBOT_EDIT).serial(101).name("Winner").build();
         MessageResult messageResult = lapsCounterService.handleMessage(robotEdit);
@@ -164,6 +156,74 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
         Robot actualRobot = robotArgumentCaptor.getValue();
         assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Winner").num(1).place(1).laps(0).build()));
+    }
+
+    @Test
+    void testTime() {
+        Message time = Message.builder().type(Type.TIME).build();
+        MessageResult messageResult = lapsCounterService.handleMessage(time);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasTime(messages.get(0));
+    }
+
+    @Test
+    void testLaps() {
+        givenRobotInits(101, 102);
+
+        Message laps = Message.builder().type(Type.LAPS).build();
+        MessageResult messageResult = lapsCounterService.handleMessage(laps);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageHasLap(messages.get(0), 101);
+        assertThatMessageHasLap(messages.get(1), 102);
+
+        Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+    }
+
+    @Test
+    void testLapMan() {
+        givenRobotInits(101, 102);
+        givenRaceState(State.RUNNING);
+
+        Message laps = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
+        MessageResult messageResult = lapsCounterService.handleMessage(laps);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1);
+
+        Mockito.verify(frameProcessor).reset();
+        Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+    }
+
+    private void givenRaceState(State state) {
+        switch (state) {
+            case FINISH:
+                lapsCounterService.handleMessage(aCommand(State.STEADY));
+                lapsCounterService.handleMessage(aCommand(State.RUNNING));
+                lapsCounterService.handleMessage(aCommand(State.FINISH));
+                break;
+            case RUNNING:
+                lapsCounterService.handleMessage(aCommand(State.STEADY));
+                lapsCounterService.handleMessage(aCommand(State.RUNNING));
+                break;
+            case STEADY:
+                lapsCounterService.handleMessage(aCommand(State.STEADY));
+                break;
+            case READY:
+        }
+    }
+
+    private void givenRobotInits(Integer... serials) {
+        for (Integer serial : serials) {
+            lapsCounterService.handleMessage(Message.builder().type(Type.ROBOT_INIT).serial(serial).build());
+        }
     }
 
     private Message aCommand(State state) {
@@ -184,5 +244,11 @@ class LapsCounterServiceTest {
         assertThat(message.getType(), equalTo(Type.LAP));
         assertThat(message.getSerial(), equalTo(serial));
         assertThat(message.getTime(), equalTo(0L));
+    }
+
+    private void assertThatMessageHasLapWithLapsCount(Message message, int serial, int laps) {
+        assertThat(message.getType(), equalTo(Type.LAP));
+        assertThat(message.getSerial(), equalTo(serial));
+        assertThat(message.getLaps(), equalTo(laps));
     }
 }

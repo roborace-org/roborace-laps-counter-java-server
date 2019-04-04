@@ -19,7 +19,7 @@ public class LapsCounterService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
-    private State state = STEADY;
+    private State state = READY;
     private final Stopwatch stopwatch = new Stopwatch();
     private final List<Robot> robots = new ArrayList<>();
 
@@ -64,10 +64,8 @@ public class LapsCounterService {
         if (parsedState == null) {
             throw new LapsCounterException("State is null");
         }
-        if ((parsedState == STEADY && state != READY)
-                || (parsedState == RUNNING && state != STEADY)
-                || (parsedState == FINISH && state != RUNNING)) {
-            throw new LapsCounterException("Wrong current state to apply command");
+        if (state == parsedState || parsedState.ordinal() != state.ordinal() + 1) {
+            throw new LapsCounterException("Wrong current state to apply command: [" + state + "]->[" + parsedState + "]");
         }
 
         MessageResult messageResult = new MessageResult(new ArrayList<>(), ResponseType.BROADCAST);
@@ -124,6 +122,9 @@ public class LapsCounterService {
         if (state != RUNNING) {
             LOG.info("Lap manual ignored: state is not running");
             throw new LapsCounterException("Lap manual ignored: state is not running");
+        }
+        if (message.getLaps() == null) {
+            throw new LapsCounterException("Laps count is not setup");
         }
 
         Robot robot = getRobotOrElseThrow(message.getSerial());
