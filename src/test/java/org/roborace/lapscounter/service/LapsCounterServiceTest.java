@@ -125,6 +125,7 @@ class LapsCounterServiceTest {
         assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
         List<Message> messages = messageResult.getMessages();
         assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLap(messages.get(0), 101);
 
         Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
         Robot actualRobot = robotArgumentCaptor.getValue();
@@ -141,10 +142,28 @@ class LapsCounterServiceTest {
         assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
         List<Message> messages = messageResult.getMessages();
         assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLap(messages.get(0), 102);
 
         Mockito.verify(frameProcessor, times(2)).robotInit(robotArgumentCaptor.capture());
         Robot actualRobot = robotArgumentCaptor.getValue();
         assertThat(actualRobot, equalTo(Robot.builder().serial(102).num(2).place(2).laps(0).build()));
+    }
+
+    @Test
+    void testRobotEdit() {
+        lapsCounterService.handleMessage(Message.builder().type(Type.ROBOT_INIT).serial(101).build());
+
+        Message robotEdit = Message.builder().type(Type.ROBOT_EDIT).serial(101).name("Winner").build();
+        MessageResult messageResult = lapsCounterService.handleMessage(robotEdit);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLap(messages.get(0), 101);
+
+        Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
+        Robot actualRobot = robotArgumentCaptor.getValue();
+        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Winner").num(1).place(1).laps(0).build()));
     }
 
     private Message aCommand(State state) {
@@ -158,6 +177,12 @@ class LapsCounterServiceTest {
 
     private void assertThatMessageHasTime(Message message) {
         assertThat(message.getType(), equalTo(Type.TIME));
+        assertThat(message.getTime(), equalTo(0L));
+    }
+
+    private void assertThatMessageHasLap(Message message, int serial) {
+        assertThat(message.getType(), equalTo(Type.LAP));
+        assertThat(message.getSerial(), equalTo(serial));
         assertThat(message.getTime(), equalTo(0L));
     }
 }
