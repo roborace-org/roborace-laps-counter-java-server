@@ -31,7 +31,7 @@ abstract class LapsCounterAbstractTest {
     protected static final int SECOND_SERIAL = 101;
 
     @Value("${local.server.port}")
-    private int port;
+    private int port = 8888;
 
     private static final String WS_SERVER = "ws://localhost:%d/";
     protected static final long TIME_SEND_INTERVAL = 10_000L;

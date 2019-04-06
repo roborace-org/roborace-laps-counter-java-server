@@ -35,6 +35,10 @@ public class MessageResult {
         return new MessageResult(new ArrayList<>(), ResponseType.BROADCAST);
     }
 
+    public static MessageResult broadcast(List<Message> messages) {
+        return new MessageResult(messages, ResponseType.BROADCAST);
+    }
+
     public void add(Message message) {
         messages.add(message);
     }

@@ -169,8 +169,8 @@ public class LapsCounterService {
         long raceTime = stopwatch.getTime();
         Type frameType = frameProcessor.checkFrame(robot, message.getFrame(), raceTime);
         if (frameType == Type.LAP) {
-            incLaps(robot, raceTime);
-            return MessageResult.broadcast(getLap(robot));
+            List<Robot> robots = incLaps(robot, raceTime);
+            return MessageResult.broadcast(getLapMessages(robots));
         } else if (frameType == Type.FRAME) {
             return MessageResult.single(new Message(Type.FRAME));
         }

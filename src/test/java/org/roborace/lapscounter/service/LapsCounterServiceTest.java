@@ -316,23 +316,37 @@ class LapsCounterServiceTest {
     }
 
     @Test
-    void testLapChangePlace() {
+    void testFrameLapChangePlace() {
         givenRobotInits(101, 102);
         givenRaceState(State.RUNNING);
         when(frameProcessor.checkFrame(any(), eq(FRAME), anyLong())).thenReturn(Type.LAP);
 
         MessageResult messageResult = lapsCounterService.handleMessage(aFrameMessage(101));
-        assertThatMessageHasLapWithLapsCount(messageResult.getMessages().get(0), 101, 1, 1);
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 1, 1);
+
         messageResult = lapsCounterService.handleMessage(aFrameMessage(102));
-        assertThatMessageHasLapWithLapsCount(messageResult.getMessages().get(0), 102, 1, 2);
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 2);
+
+        messageResult = lapsCounterService.handleMessage(aFrameMessage(102));
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 2, 1);
+        assertThatMessageHasLapWithLapsCount(messages.get(1), 101, 1, 2);
 
 
         Mockito.verify(frameProcessor).reset();
-        Mockito.verify(frameProcessor, times(2)).checkFrame(robotArgumentCaptor.capture(), eq(FRAME), raceTimeArgumentCaptor.capture());
+        Mockito.verify(frameProcessor, times(3)).checkFrame(robotArgumentCaptor.capture(), eq(FRAME), raceTimeArgumentCaptor.capture());
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        Robot expected = Robot.builder().serial(102).num(2).place(2).laps(1).time(raceTimeArgumentCaptor.getValue()).build();
+        Robot expected = Robot.builder().serial(102).num(2).place(1).laps(2).time(raceTimeArgumentCaptor.getValue()).build();
         assertThat(actualRobot, equalTo(expected));
     }
 
