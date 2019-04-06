@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparingInt;
 import static org.roborace.lapscounter.domain.State.*;
 
 
@@ -45,17 +46,15 @@ public class LapsCounterService {
             case TIME:
                 return MessageResult.single(getTime());
             case LAPS:
-                return new MessageResult(getLapMessages(), ResponseType.SINGLE);
-            case LAP:
-                throw new LapsCounterException("Method not supported");
+                return new MessageResult(getLapMessages(robots), ResponseType.SINGLE);
             case LAP_MAN:
                 return lapManual(message);
             case FRAME:
                 return frame(message);
+            case LAP:
             case ERROR:
-                throw new LapsCounterException("Method not supported");
             default:
-                return null;
+                throw new LapsCounterException("Method not supported: [" + message.getType() + "]");
         }
     }
 
@@ -76,7 +75,7 @@ public class LapsCounterService {
                 case STEADY:
                     robots.forEach(Robot::reset);
                     frameProcessor.reset();
-                    messageResult.addAll(getLapMessages());
+                    messageResult.addAll(getLapMessages(robots));
                     break;
                 case RUNNING:
                     stopwatch.start();
@@ -93,8 +92,7 @@ public class LapsCounterService {
 
     private boolean isCorrectCommand(State newState) {
         if (newState.ordinal() == state.ordinal() + 1) return true;
-        if (newState.ordinal() == 0 && state.ordinal() == values().length - 1) return true;
-        return false;
+        return newState.ordinal() == 0 && state.ordinal() == values().length - 1;
     }
 
     private MessageResult robotInit(Message message) {
@@ -134,12 +132,29 @@ public class LapsCounterService {
         }
 
         Robot robot = getRobotOrElseThrow(message.getSerial());
+        MessageResult broadcast = MessageResult.broadcast();
         if (message.getLaps() > 0) {
-            incLaps(robot, stopwatch.getTime());
+            List<Robot> affectedRobots = incLaps(robot, stopwatch.getTime());
+            broadcast.addAll(getLapMessages(affectedRobots));
         } else {
             robot.decLaps(); // TODO restore time
+            broadcast.add(getLap(robot));
         }
-        return MessageResult.broadcast(getLap(robot));
+        return broadcast;
+    }
+
+    List<Robot> sortRobotsByLapsAndTime() {
+        robots.sort(comparingInt(Robot::getLaps).reversed().thenComparingLong(Robot::getTime));
+        List<Robot> affectedRobots = new ArrayList<>(robots.size());
+        for (int i = 0; i < robots.size(); i++) {
+            int place = i + 1;
+            Robot robot = robots.get(i);
+            if (robot.getPlace() != place) {
+                robot.setPlace(place);
+                affectedRobots.add(robot);
+            }
+        }
+        return affectedRobots;
     }
 
     private MessageResult frame(Message message) {
@@ -160,12 +175,17 @@ public class LapsCounterService {
         return null;
     }
 
-    private void incLaps(Robot robot, long raceTime) {
+    private List<Robot> incLaps(Robot robot, long raceTime) {
         robot.incLaps();
         robot.setTime(raceTime);
+        List<Robot> affectedRobots = sortRobotsByLapsAndTime();
+        if (affectedRobots.isEmpty()) {
+            affectedRobots.add(robot);
+        }
+        return affectedRobots;
     }
 
-    private List<Message> getLapMessages() {
+    private List<Message> getLapMessages(List<Robot> robots) {
         return robots.stream()
                 .map(this::getLap)
                 .collect(Collectors.toList());
@@ -201,6 +221,7 @@ public class LapsCounterService {
         message.setNum(robot.getNum());
         message.setLaps(robot.getLaps());
         message.setTime(robot.getTime());
+        message.setPlace(robot.getPlace());
         return message;
     }
 

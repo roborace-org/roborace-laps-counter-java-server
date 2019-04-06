@@ -26,6 +26,7 @@ public class Message {
     private Integer num;
     private Integer laps;
     private Long time;
+    private Integer place;
 
     private String message;
 
