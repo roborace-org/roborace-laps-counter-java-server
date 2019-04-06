@@ -137,14 +137,16 @@ public class LapsCounterService {
             List<Robot> affectedRobots = incLaps(robot, stopwatch.getTime());
             broadcast.addAll(getLapMessages(affectedRobots));
         } else {
-            robot.decLaps(); // TODO restore time
-            broadcast.add(getLap(robot));
+            List<Robot> affectedRobots = decLaps(robot);
+            broadcast.addAll(getLapMessages(affectedRobots));
         }
         return broadcast;
     }
 
     List<Robot> sortRobotsByLapsAndTime() {
-        robots.sort(comparingInt(Robot::getLaps).reversed().thenComparingLong(Robot::getTime));
+        robots.sort(comparingInt(Robot::getLaps).reversed()
+                .thenComparingLong(Robot::getTime)
+                .thenComparingInt(Robot::getNum));
         List<Robot> affectedRobots = new ArrayList<>(robots.size());
         for (int i = 0; i < robots.size(); i++) {
             int place = i + 1;
@@ -176,8 +178,18 @@ public class LapsCounterService {
     }
 
     private List<Robot> incLaps(Robot robot, long raceTime) {
-        robot.incLaps();
+        robot.incLaps(raceTime);
         robot.setTime(raceTime);
+        List<Robot> affectedRobots = sortRobotsByLapsAndTime();
+        if (affectedRobots.isEmpty()) {
+            affectedRobots.add(robot);
+        }
+        return affectedRobots;
+    }
+
+    private List<Robot> decLaps(Robot robot) {
+        robot.decLaps();
+        robot.setTime(robot.extractLastLapTime());
         List<Robot> affectedRobots = sortRobotsByLapsAndTime();
         if (affectedRobots.isEmpty()) {
             affectedRobots.add(robot);

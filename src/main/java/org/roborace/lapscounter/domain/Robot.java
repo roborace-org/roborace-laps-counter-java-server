@@ -2,10 +2,13 @@ package org.roborace.lapscounter.domain;
 
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "lapTimes")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +23,11 @@ public class Robot {
     private int laps;
     private long time;
 
-    public void incLaps() {
+    private final List<Long> lapTimes = new ArrayList<>();
+
+    public void incLaps(long raceTime) {
         laps++;
+        lapTimes.add(raceTime);
     }
 
     public void decLaps() {
@@ -31,5 +37,12 @@ public class Robot {
     public void reset() {
         laps = 0;
         time = 0;
+    }
+
+    public long extractLastLapTime() {
+        if (lapTimes.isEmpty()) return 0L;
+        lapTimes.remove(lapTimes.size() - 1);
+        if (lapTimes.isEmpty()) return 0L;
+        return lapTimes.get(lapTimes.size() - 1);
     }
 }

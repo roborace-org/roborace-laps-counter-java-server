@@ -15,6 +15,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
@@ -226,6 +227,54 @@ class LapsCounterServiceTest {
     }
 
     @Test
+    void testLapManDec() throws InterruptedException {
+        givenRobotInits(101, 102);
+        givenRaceState(State.RUNNING);
+
+        Thread.sleep(100);
+        Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
+        lapsCounterService.handleMessage(lapsInc);
+        Thread.sleep(50);
+        Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
+        MessageResult messageResult = lapsCounterService.handleMessage(lapsDec);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 0, 1);
+        assertThatMessageHasLapWithLapsCount(messages.get(1), 102, 0, 2);
+        assertThat(messages.get(1).getTime(), equalTo(0L));
+
+        Mockito.verify(frameProcessor).reset();
+        Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+    }
+
+    @Test
+    void testLapManDecCheckTime() throws InterruptedException {
+        givenRobotInits(102);
+        givenRaceState(State.RUNNING);
+
+        Thread.sleep(100);
+        Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
+        MessageResult messageResult = lapsCounterService.handleMessage(lapsInc);
+        Long firstLapTime = messageResult.getMessages().get(0).getTime();
+        Thread.sleep(50);
+        lapsCounterService.handleMessage(lapsInc);
+        Thread.sleep(50);
+        Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
+        messageResult = lapsCounterService.handleMessage(lapsDec);
+
+        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
+        List<Message> messages = messageResult.getMessages();
+        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 1);
+        assertThat(messages.get(0).getTime(), equalTo(firstLapTime));
+
+        Mockito.verify(frameProcessor).reset();
+        Mockito.verify(frameProcessor).robotInit(any(Robot.class));
+    }
+
+    @Test
     void testFrame() {
         givenRobotInits(101, 102);
         givenRaceState(State.RUNNING);
@@ -303,6 +352,41 @@ class LapsCounterServiceTest {
         assertThat(affectedRobots.get(1).getPlace(), equalTo(2));
         assertThat(affectedRobots.get(2), equalTo(second));
         assertThat(affectedRobots.get(2).getPlace(), equalTo(3));
+    }
+
+    @Test
+    void testSortRobotsByLapsAndTimeAndNum() {
+        Robot first = aRobot(101, 1, 0, 0);
+        first.setNum(2);
+        Robot second = aRobot(102, 2, 0, 0);
+        second.setNum(1);
+        List<Robot> robots = asList(first, second);
+        ReflectionTestUtils.setField(lapsCounterService, "robots", robots);
+        List<Robot> affectedRobots = lapsCounterService.sortRobotsByLapsAndTime();
+
+        assertThat(affectedRobots, Matchers.hasSize(2));
+        assertThat(affectedRobots.get(0), equalTo(second));
+        assertThat(affectedRobots.get(0).getPlace(), equalTo(1));
+        assertThat(affectedRobots.get(1), equalTo(first));
+        assertThat(affectedRobots.get(1).getPlace(), equalTo(2));
+    }
+
+    @Test
+    void testScheduleIfNotStarted() {
+        Message scheduled = lapsCounterService.scheduled();
+        assertThat(scheduled, nullValue());
+    }
+
+    @Test
+    void testScheduleIfRunning() {
+        givenRaceState(State.RUNNING);
+
+        Message scheduled = lapsCounterService.scheduled();
+        assertThat(scheduled.getType(), equalTo(Type.TIME));
+        assertThat(scheduled.getTime(), Matchers.greaterThanOrEqualTo(0L));
+        assertThat(scheduled.getTime(), Matchers.lessThan(50L));
+
+        Mockito.verify(frameProcessor).reset();
     }
 
     private Robot aRobot(int serial, int place, int laps, long time) {
