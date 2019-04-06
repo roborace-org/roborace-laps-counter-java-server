@@ -37,6 +37,11 @@ class LapsCounterServiceTest {
     @Captor
     private ArgumentCaptor<Long> raceTimeArgumentCaptor;
 
+
+    MessageResult messageResult;
+    List<Message> messages;
+
+
     @BeforeEach
     void setUp() {
 
@@ -51,24 +56,18 @@ class LapsCounterServiceTest {
     void testInitialState() {
         Message state = Message.builder().type(Type.STATE).build();
 
-        MessageResult messageResult = lapsCounterService.handleMessage(state);
+        whenHandleMessage(state);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
-
+        assertThatMessageResultHasTypeAndMessages(ResponseType.SINGLE, 1);
         assertThatMessageHasState(messages.get(0), State.READY);
     }
 
     @Test
     void testCommandSteady() {
         Message command = aCommand(State.STEADY);
-        MessageResult messageResult = lapsCounterService.handleMessage(command);
+        whenHandleMessage(command);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
-
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasState(messages.get(0), State.STEADY);
         Mockito.verify(frameProcessor).reset();
     }
@@ -86,12 +85,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.STEADY);
 
         Message commandGo = aCommand(State.RUNNING);
-        MessageResult messageResult = lapsCounterService.handleMessage(commandGo);
+        whenHandleMessage(commandGo);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(2));
-
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThatMessageHasState(messages.get(0), State.RUNNING);
         assertThatMessageHasTime(messages.get(1));
 
@@ -103,12 +99,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
 
         Message commandFinish = aCommand(State.FINISH);
-        MessageResult messageResult = lapsCounterService.handleMessage(commandFinish);
+        whenHandleMessage(commandFinish);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(2));
-
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThatMessageHasState(messages.get(0), State.FINISH);
         assertThatMessageHasTime(messages.get(1));
 
@@ -118,11 +111,9 @@ class LapsCounterServiceTest {
     @Test
     void testRobotInit() {
         Message robotInit = Message.builder().type(Type.ROBOT_INIT).serial(101).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(robotInit);
+        whenHandleMessage(robotInit);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLap(messages.get(0), 101);
 
         Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
@@ -135,11 +126,9 @@ class LapsCounterServiceTest {
         givenRobotInits(101);
 
         Message secondRobotInit = Message.builder().type(Type.ROBOT_INIT).serial(102).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(secondRobotInit);
+        whenHandleMessage(secondRobotInit);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLap(messages.get(0), 102);
 
         Mockito.verify(frameProcessor, times(2)).robotInit(robotArgumentCaptor.capture());
@@ -152,11 +141,9 @@ class LapsCounterServiceTest {
         givenRobotInits(101);
 
         Message robotEdit = Message.builder().type(Type.ROBOT_EDIT).serial(101).name("Winner").build();
-        MessageResult messageResult = lapsCounterService.handleMessage(robotEdit);
+        whenHandleMessage(robotEdit);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLap(messages.get(0), 101);
 
         Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
@@ -167,11 +154,9 @@ class LapsCounterServiceTest {
     @Test
     void testTime() {
         Message time = Message.builder().type(Type.TIME).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(time);
+        whenHandleMessage(time);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.SINGLE, 1);
         assertThatMessageHasTime(messages.get(0));
     }
 
@@ -180,11 +165,9 @@ class LapsCounterServiceTest {
         givenRobotInits(101, 102);
 
         Message laps = Message.builder().type(Type.LAPS).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(laps);
+        whenHandleMessage(laps);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.SINGLE, 2);
         assertThatMessageHasLap(messages.get(0), 101);
         assertThatMessageHasLap(messages.get(1), 102);
 
@@ -197,11 +180,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
 
         Message laps = Message.builder().type(Type.LAP_MAN).serial(101).laps(1).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(laps);
+        whenHandleMessage(laps);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 1, 1);
 
         Mockito.verify(frameProcessor).reset();
@@ -214,11 +195,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
 
         Message laps = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(laps);
+        whenHandleMessage(laps);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(1), 101, 0, 2);
 
@@ -233,14 +212,12 @@ class LapsCounterServiceTest {
 
         Thread.sleep(100);
         Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
-        lapsCounterService.handleMessage(lapsInc);
+        whenHandleMessage(lapsInc);
         Thread.sleep(50);
         Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(lapsDec);
+        whenHandleMessage(lapsDec);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(2));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 0, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(1), 102, 0, 2);
         assertThat(messages.get(1).getTime(), equalTo(0L));
@@ -256,17 +233,15 @@ class LapsCounterServiceTest {
 
         Thread.sleep(100);
         Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
-        MessageResult messageResult = lapsCounterService.handleMessage(lapsInc);
+        whenHandleMessage(lapsInc);
         Long firstLapTime = messageResult.getMessages().get(0).getTime();
         Thread.sleep(50);
-        lapsCounterService.handleMessage(lapsInc);
+        whenHandleMessage(lapsInc);
         Thread.sleep(50);
         Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
-        messageResult = lapsCounterService.handleMessage(lapsDec);
+        whenHandleMessage(lapsDec);
 
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 1);
         assertThat(messages.get(0).getTime(), equalTo(firstLapTime));
 
@@ -280,10 +255,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
         when(frameProcessor.checkFrame(argThat(robot -> robot.getSerial() == 101), eq(FRAME), anyLong())).thenReturn(Type.FRAME);
 
-        MessageResult messageResult = lapsCounterService.handleMessage(aFrameMessage(101));
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.SINGLE));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        whenHandleMessage(aFrameMessage(101));
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.SINGLE, 1);
         assertThatMessageHasFrame(messages.get(0));
 
         Mockito.verify(frameProcessor).reset();
@@ -300,10 +274,9 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
         when(frameProcessor.checkFrame(argThat(robot -> robot.getSerial() == 101), eq(FRAME), anyLong())).thenReturn(Type.LAP);
 
-        MessageResult messageResult = lapsCounterService.handleMessage(aFrameMessage(101));
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        whenHandleMessage(aFrameMessage(101));
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 1, 1);
 
 
@@ -321,21 +294,17 @@ class LapsCounterServiceTest {
         givenRaceState(State.RUNNING);
         when(frameProcessor.checkFrame(any(), eq(FRAME), anyLong())).thenReturn(Type.LAP);
 
-        MessageResult messageResult = lapsCounterService.handleMessage(aFrameMessage(101));
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        List<Message> messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        whenHandleMessage(aFrameMessage(101));
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 1, 1);
 
-        messageResult = lapsCounterService.handleMessage(aFrameMessage(102));
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        messages = messageResult.getMessages();
-        assertThat(messages, Matchers.hasSize(1));
+        whenHandleMessage(aFrameMessage(102));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 2);
 
-        messageResult = lapsCounterService.handleMessage(aFrameMessage(102));
-        assertThat(messageResult.getResponseType(), equalTo(ResponseType.BROADCAST));
-        messages = messageResult.getMessages();
+        whenHandleMessage(aFrameMessage(102));
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThat(messages, Matchers.hasSize(2));
         assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 2, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(1), 101, 1, 2);
@@ -407,6 +376,10 @@ class LapsCounterServiceTest {
         return Robot.builder().serial(serial).place(place).laps(laps).time(time).build();
     }
 
+    private Message aCommand(State state) {
+        return Message.builder().type(Type.COMMAND).state(state).build();
+    }
+
     private Message aFrameMessage(int serial) {
         return Message.builder().type(Type.FRAME).serial(serial).frame(FRAME).build();
     }
@@ -429,14 +402,20 @@ class LapsCounterServiceTest {
         }
     }
 
-    private void givenRobotInits(Integer... serials) {
-        for (Integer serial : serials) {
+    private void whenHandleMessage(Message message) {
+        messageResult = lapsCounterService.handleMessage(message);
+        messages = messageResult.getMessages();
+    }
+
+    private void givenRobotInits(int... serials) {
+        for (int serial : serials) {
             lapsCounterService.handleMessage(Message.builder().type(Type.ROBOT_INIT).serial(serial).build());
         }
     }
 
-    private Message aCommand(State state) {
-        return Message.builder().type(Type.COMMAND).state(state).build();
+    private void assertThatMessageResultHasTypeAndMessages(ResponseType responseType, int countMessages) {
+        assertThat(messageResult.getResponseType(), equalTo(responseType));
+        assertThat(messageResult.getMessages(), Matchers.hasSize(countMessages));
     }
 
     private void assertThatMessageHasState(Message message, State state) {
