@@ -32,6 +32,10 @@ public class FrameProcessor {
         frameInfoBySerialMap.put(robot.getSerial(), new FrameRobotInfo());
     }
 
+    public void robotRemove(Robot robot) {
+        frameInfoBySerialMap.remove(robot.getSerial());
+    }
+
     public void reset() {
         frameInfoBySerialMap.values().forEach(FrameRobotInfo::reset);
     }

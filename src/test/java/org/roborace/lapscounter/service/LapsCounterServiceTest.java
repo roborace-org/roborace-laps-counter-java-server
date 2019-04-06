@@ -152,6 +152,25 @@ class LapsCounterServiceTest {
     }
 
     @Test
+    void testRobotRemoveSingle() {
+        givenRobotInits(101);
+
+        Message robotRemove = Message.builder().type(Type.ROBOT_REMOVE).serial(101).build();
+        whenHandleMessage(robotRemove);
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
+        assertThat(messages.get(0).getType(), equalTo(Type.ROBOT_REMOVE));
+        assertThat(messages.get(0).getSerial(), equalTo(101));
+
+        Message laps = Message.builder().type(Type.LAPS).build();
+        whenHandleMessage(laps);
+        assertThatMessageResultHasTypeAndMessages(ResponseType.SINGLE, 0);
+
+        Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
+        Mockito.verify(frameProcessor).robotRemove(robotArgumentCaptor.capture());
+    }
+
+    @Test
     void testTime() {
         Message time = Message.builder().type(Type.TIME).build();
         whenHandleMessage(time);

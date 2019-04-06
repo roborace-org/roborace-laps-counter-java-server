@@ -43,6 +43,8 @@ public class LapsCounterService {
                 return robotInit(message);
             case ROBOT_EDIT:
                 return robotEdit(message);
+            case ROBOT_REMOVE:
+                return robotRemove(message);
             case TIME:
                 return MessageResult.single(getTime());
             case LAPS:
@@ -122,6 +124,16 @@ public class LapsCounterService {
         return MessageResult.broadcast(getLap(robot));
     }
 
+    private MessageResult robotRemove(Message message) {
+        Robot robot = getRobotOrElseThrow(message.getSerial());
+        robots.remove(robot);
+        frameProcessor.robotRemove(robot);
+        MessageResult broadcast = MessageResult.broadcast();
+        broadcast.add(message);
+        broadcast.addAll(getLapMessages(sortRobotsByLapsAndTime()));
+        return broadcast;
+    }
+
     private MessageResult lapManual(Message message) {
         if (state != RUNNING) {
             LOG.info("Lap manual ignored: state is not running");
@@ -132,15 +144,13 @@ public class LapsCounterService {
         }
 
         Robot robot = getRobotOrElseThrow(message.getSerial());
-        MessageResult broadcast = MessageResult.broadcast();
+        List<Robot> affectedRobots;
         if (message.getLaps() > 0) {
-            List<Robot> affectedRobots = incLaps(robot, stopwatch.getTime());
-            broadcast.addAll(getLapMessages(affectedRobots));
+            affectedRobots = incLaps(robot, stopwatch.getTime());
         } else {
-            List<Robot> affectedRobots = decLaps(robot);
-            broadcast.addAll(getLapMessages(affectedRobots));
+            affectedRobots = decLaps(robot);
         }
-        return broadcast;
+        return MessageResult.broadcast(getLapMessages(affectedRobots));
     }
 
     List<Robot> sortRobotsByLapsAndTime() {
