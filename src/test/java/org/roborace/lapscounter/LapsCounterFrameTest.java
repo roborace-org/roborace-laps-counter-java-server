@@ -122,6 +122,8 @@ class LapsCounterFrameTest extends LapsCounterAbstractTest {
         sendFrame(robot1, FIRST_SERIAL, FRAME_1);
         Thread.sleep(safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_2);
+        Thread.sleep(safeInterval);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
     }
 
     private void sendFrame(WebsocketClient robot, int serial, int frame) {

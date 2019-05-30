@@ -26,6 +26,9 @@ public class FrameProcessor {
                           @Value("${laps.frames}") List<Integer> frames) {
         this.safeInterval = safeInterval;
         this.frames = frames;
+        if (frames.isEmpty()) {
+            throw new RuntimeException("Frames are not detected");
+        }
     }
 
     public void robotInit(Robot robot) {
@@ -54,35 +57,65 @@ public class FrameProcessor {
             return Type.ERROR;
         }
 
-        if (isTooQuick(raceTime, frameRobotInfo.getLastFrameTime())) {
+        List<Integer> robotFrames = frameRobotInfo.getFrames();
+
+        if (isTooQuick(raceTime, frameRobotInfo.getLastFrameTime()) && !robotFrames.isEmpty()) {
             LOG.warn("Frame is not counted (too quick): {}, robot: {}", frame, robot.getSerial());
             return Type.ERROR;
         }
 
-        LOG.info("Frame is counted: {}, robot: {}", frame, robot.getSerial());
-        frameRobotInfo.updateInfo(raceTime, frame);
+        if (isNextRobotFrame(frame, robotFrames)) {
+            LOG.info("Frame is counted: {}, robot: {}", frame, robot.getSerial());
+            frameRobotInfo.updateInfo(raceTime, frame);
+        } else {
+            LOG.info("Frame is wrong: {}, robot: {}", frame, robot.getSerial());
+            if (frame.equals(frames.get(0))) {
+                robotFrames.clear();
+                robotFrames.add(frames.get(0));
+            }
+            return Type.WRONG_FRAME;
+        }
 
-        if (allFrames(frameRobotInfo.getFrames())) {
+        if (allFrames(robotFrames)) {
             LOG.info("Lap is counted: {}", robot);
+            robotFrames.clear();
+            robotFrames.add(frames.get(0));
             return Type.LAP;
         }
 
         return Type.FRAME;
     }
 
-    private boolean allFrames(List<Integer> robotFrames) {
+    private boolean isNextRobotFrame(Integer frame, List<Integer> robotFrames) {
+        return frame.equals(expectedNextFrame(getLastRobotFrame(robotFrames)));
+    }
 
-        int countFrames = 0;
-        for (Integer robotFrame : robotFrames) {
-            if (robotFrame.equals(frames.get(countFrames))) {
-                countFrames++;
-                if (frames.size() == countFrames) {
-                    robotFrames.clear();
-                    return true;
-                }
+    private Integer getLastRobotFrame(List<Integer> robotFrames) {
+        if (robotFrames.isEmpty()) {
+            return null;
+        }
+        return robotFrames.get(robotFrames.size() - 1);
+    }
+
+    private Integer expectedNextFrame(Integer lastFrame) {
+        if (lastFrame == null) {
+            return frames.get(0);
+        }
+
+        boolean find = false;
+        for (Integer frame : frames) {
+            if (find) {
+                return frame;
+            }
+            if (frame.equals(lastFrame)) {
+                find = true;
             }
         }
-        return false;
+        return frames.get(0);
+    }
+
+    private boolean allFrames(List<Integer> robotFrames) {
+        return robotFrames.size() == frames.size() + 1;
     }
 
     private boolean isTooQuick(long raceTime, long lastFrameTime) {
