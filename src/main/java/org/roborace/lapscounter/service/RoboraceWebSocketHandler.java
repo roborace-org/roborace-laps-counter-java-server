@@ -68,7 +68,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
         LOG.info("ConnectionEstablished {}", session.getRemoteAddress());
         sessions.add(session);
 
-        sendObjectAsJson(lapsCounterService.getState(), session);
+        singleSession(lapsCounterService.afterConnectionEstablished(), session);
     }
 
     @Override
