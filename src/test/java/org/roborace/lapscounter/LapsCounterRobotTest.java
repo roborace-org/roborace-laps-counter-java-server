@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Type;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 import java.util.Random;
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.roborace.lapscounter.domain.Message.builder;
 import static org.roborace.lapscounter.domain.State.*;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LapsCounterRobotTest extends LapsCounterAbstractTest {
 
@@ -63,6 +65,7 @@ class LapsCounterRobotTest extends LapsCounterAbstractTest {
 
         shouldReceiveType(ui, Type.LAP);
         assertThat(ui.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(ui.getLastMessage().getName(), equalTo("Robot " + FIRST_SERIAL));
 
     }
 

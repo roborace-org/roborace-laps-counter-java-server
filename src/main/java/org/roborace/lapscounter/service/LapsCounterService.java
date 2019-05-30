@@ -106,6 +106,7 @@ public class LapsCounterService {
         } else {
             robot = new Robot();
             robot.setSerial(message.getSerial());
+            robot.setName("Robot " + message.getSerial());
             robot.setNum(robots.size() + 1);
             robot.setPlace(robots.size() + 1);
             robot.reset();

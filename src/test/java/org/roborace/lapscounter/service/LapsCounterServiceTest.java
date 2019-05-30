@@ -118,7 +118,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).robotInit(robotArgumentCaptor.capture());
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(101).num(1).place(1).laps(0).build()));
+        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Robot 101").num(1).place(1).laps(0).build()));
     }
 
     @Test
@@ -133,7 +133,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor, times(2)).robotInit(robotArgumentCaptor.capture());
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(102).num(2).place(2).laps(0).build()));
+        assertThat(actualRobot, equalTo(Robot.builder().serial(102).name("Robot 102").num(2).place(2).laps(0).build()));
     }
 
     @Test
@@ -284,7 +284,7 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(101).num(1).place(1).laps(0).build()));
+        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Robot 101").num(1).place(1).laps(0).build()));
     }
 
     @Test
@@ -304,7 +304,7 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(101).num(1).place(1).laps(1).time(raceTimeArgumentCaptor.getValue()).build()));
+        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Robot 101").num(1).place(1).laps(1).time(raceTimeArgumentCaptor.getValue()).build()));
     }
 
     @Test
@@ -334,7 +334,7 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        Robot expected = Robot.builder().serial(102).num(2).place(1).laps(2).time(raceTimeArgumentCaptor.getValue()).build();
+        Robot expected = Robot.builder().serial(102).name("Robot 102").num(2).place(1).laps(2).time(raceTimeArgumentCaptor.getValue()).build();
         assertThat(actualRobot, equalTo(expected));
     }
 
