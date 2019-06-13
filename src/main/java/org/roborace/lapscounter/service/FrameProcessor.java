@@ -44,7 +44,12 @@ public class FrameProcessor {
     }
 
     public Type checkFrame(Robot robot, Integer frame, long raceTime) {
+        Type frameResult = getFrameResult(robot, frame, raceTime);
+        LOG.info("Frame result: {}, {}, robot: {}", frameResult, frame, robot.getSerial());
+        return frameResult;
+    }
 
+    private Type getFrameResult(Robot robot, Integer frame, long raceTime) {
         if (!frames.contains(frame)) {
             LOG.warn("Frame not found: {}, robot: {}", frame, robot.getSerial());
             return Type.ERROR;
@@ -64,58 +69,54 @@ public class FrameProcessor {
             return Type.ERROR;
         }
 
-        if (isNextRobotFrame(frame, robotFrames)) {
-            LOG.info("Frame is counted: {}, robot: {}", frame, robot.getSerial());
-            frameRobotInfo.updateInfo(raceTime, frame);
-        } else {
-            LOG.info("Frame is wrong: {}, robot: {}", frame, robot.getSerial());
-            if (frame.equals(frames.get(0))) {
-                robotFrames.clear();
-                robotFrames.add(frames.get(0));
-            }
-            return Type.WRONG_FRAME;
-        }
-
-        if (allFrames(robotFrames)) {
-            LOG.info("Lap is counted: {}", robot);
+        if (allFrames(frame, robotFrames)) {
             robotFrames.clear();
-            robotFrames.add(frames.get(0));
+            frameRobotInfo.placeFrame(raceTime, frame);
             return Type.LAP;
         }
 
-        return Type.FRAME;
-    }
-
-    private boolean isNextRobotFrame(Integer frame, List<Integer> robotFrames) {
-        return frame.equals(expectedNextFrame(getLastRobotFrame(robotFrames)));
-    }
-
-    private Integer getLastRobotFrame(List<Integer> robotFrames) {
-        if (robotFrames.isEmpty()) {
-            return null;
-        }
-        return robotFrames.get(robotFrames.size() - 1);
-    }
-
-    private Integer expectedNextFrame(Integer lastFrame) {
-        if (lastFrame == null) {
-            return frames.get(0);
+        if (isNextRobotFrame(frame, frameRobotInfo.getLastFrame())) {
+            frameRobotInfo.placeFrame(raceTime, frame);
+            return Type.FRAME;
         }
 
-        boolean find = false;
-        for (Integer frame : frames) {
-            if (find) {
-                return frame;
-            }
-            if (frame.equals(lastFrame)) {
-                find = true;
-            }
+        if (isLastRobotFrame(frame, frameRobotInfo.getLastFrame())) {
+            return Type.DUPLICATE_FRAME;
         }
-        return frames.get(0);
+
+        if (isPreviousRobotFrame(frame, frameRobotInfo.getLastFrame())) {
+            frameRobotInfo.removeLastFrame(frame);
+            return Type.WRONG_ROTATION;
+        }
+
+        return Type.WRONG_FRAME;
+
     }
 
-    private boolean allFrames(List<Integer> robotFrames) {
-        return robotFrames.size() == frames.size() + 1;
+    private boolean isNextRobotFrame(Integer frame, Integer lastFrame) {
+        return frame.equals(getExpectedNextFrame(lastFrame));
+    }
+
+    private boolean isLastRobotFrame(Integer frame, Integer lastFrame) {
+        return frame.equals(lastFrame);
+    }
+
+    private boolean isPreviousRobotFrame(Integer frame, Integer lastFrame) {
+        return frame.equals(getExpectedPrevFrame(lastFrame));
+    }
+
+    private Integer getExpectedNextFrame(Integer lastFrame) {
+        int lastFrameIndex = frames.indexOf(lastFrame);
+        return frames.get((lastFrameIndex + 1) % frames.size());
+    }
+
+    private Integer getExpectedPrevFrame(Integer lastFrame) {
+        int lastFrameIndex = frames.indexOf(lastFrame);
+        return frames.get((lastFrameIndex - 1 + frames.size()) % frames.size());
+    }
+
+    private boolean allFrames(Integer frame, List<Integer> robotFrames) {
+        return robotFrames.size() == frames.size() && frame.equals(frames.get(0));
     }
 
     private boolean isTooQuick(long raceTime, long lastFrameTime) {
