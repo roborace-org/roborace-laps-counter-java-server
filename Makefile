@@ -11,7 +11,7 @@ build-no-tests:
 unit-tests:
 	mvn -B test
 integration-tests:
-	mvn -B verify
+	mvn -B failsafe:integration-test
 qa:
 	mvn -B pmd:check -Dpmd.printFailingErrors=true
 run:

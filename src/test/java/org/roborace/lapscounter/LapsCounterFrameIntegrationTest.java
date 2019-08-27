@@ -20,7 +20,7 @@ import static org.roborace.lapscounter.domain.Message.builder;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=300")
-class LapsCounterFrameTest extends LapsCounterAbstractTest {
+class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
     private static final int FRAME_0 = 0xAA00;
     private static final int FRAME_1 = 0xAA01;

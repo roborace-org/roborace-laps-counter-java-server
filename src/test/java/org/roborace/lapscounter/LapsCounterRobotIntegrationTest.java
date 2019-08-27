@@ -20,7 +20,7 @@ import static org.roborace.lapscounter.domain.State.*;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LapsCounterRobotTest extends LapsCounterAbstractTest {
+class LapsCounterRobotIntegrationTest extends LapsCounterAbstractTest {
 
     private static final int MAX_ROBOTS = 8;
     private WebsocketClient robot1;

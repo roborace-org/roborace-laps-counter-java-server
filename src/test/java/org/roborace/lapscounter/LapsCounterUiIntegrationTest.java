@@ -20,7 +20,7 @@ import static org.roborace.lapscounter.domain.State.*;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LapsCounterUiTest extends LapsCounterAbstractTest {
+class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
 
     @BeforeEach
     void setUp() {
