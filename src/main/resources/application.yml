@@ -2,5 +2,5 @@ server:
   port: 8888
 
 laps:
-  safe-interval: 5000
+  safe-interval: 2000
   frames: 0xAA00, 0xAA01, 0xAA02
