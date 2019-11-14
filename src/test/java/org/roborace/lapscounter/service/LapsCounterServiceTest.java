@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -444,7 +445,7 @@ class LapsCounterServiceTest {
 
     private void assertThatMessageHasTime(Message message) {
         assertThat(message.getType(), equalTo(Type.TIME));
-        assertThat(message.getTime(), equalTo(0L));
+        assertThat(message.getTime(), lessThanOrEqualTo(1L));
     }
 
     private void assertThatMessageHasFrame(Message message) {

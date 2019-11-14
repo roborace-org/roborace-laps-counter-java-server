@@ -17,10 +17,10 @@ class StopwatchTest {
 
         stopwatch.start();
         Thread.sleep(DELAY);
-        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 5));
+        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 10));
 
         stopwatch.finish();
-        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 10));
+        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 20));
     }
 
     @Test
