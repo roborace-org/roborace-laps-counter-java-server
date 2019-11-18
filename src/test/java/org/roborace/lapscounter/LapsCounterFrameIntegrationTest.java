@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.roborace.lapscounter.domain.Message.builder;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=300")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "laps.safe-interval=100")
 class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
     private static final int FRAME_0 = 0xAA00;
@@ -116,13 +116,13 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     }
 
     private void sendAllFrames() throws InterruptedException {
-        Thread.sleep(safeInterval);
+        Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_0);
-        Thread.sleep(safeInterval);
+        Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_1);
-        Thread.sleep(safeInterval);
+        Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_2);
-        Thread.sleep(safeInterval);
+        Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_0);
     }
 
