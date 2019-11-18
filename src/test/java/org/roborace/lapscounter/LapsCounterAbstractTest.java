@@ -33,7 +33,7 @@ abstract class LapsCounterAbstractTest {
     @Value("${local.server.port}")
     private int port = 8888;
 
-    private static final String WS_SERVER = "ws://localhost:%d/";
+    private static final String WS_SERVER = "ws://localhost:%d/ws";
     protected static final long TIME_SEND_INTERVAL = 10_000L;
 
     protected final ObjectMapper objectMapper = new ObjectMapper();

@@ -15,6 +15,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private RoboraceWebSocketHandler roboraceWebSocketHandler;
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(this.roboraceWebSocketHandler, "/").setAllowedOrigins("*");
+        registry.addHandler(this.roboraceWebSocketHandler, "/ws").setAllowedOrigins("*");
     }
 }
