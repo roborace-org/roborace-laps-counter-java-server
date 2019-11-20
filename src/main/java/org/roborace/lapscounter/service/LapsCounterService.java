@@ -251,6 +251,8 @@ public class LapsCounterService {
         message.setNum(robot.getNum());
         message.setLaps(robot.getLaps());
         message.setTime(robot.getTime());
+        message.setBestLapTime(robot.getBestLapTime());
+        message.setLastLapTime(robot.getLastLapTime());
         message.setPlace(robot.getPlace());
         message.setLastLapTime(robot.getLastLapTime());
         return message;

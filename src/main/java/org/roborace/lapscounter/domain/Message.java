@@ -27,6 +27,7 @@ public class Message {
     private Integer laps;
     private Long time;
     private Long lastLapTime;
+    private Long bestLapTime;
     private Integer place;
 
     private String message;

@@ -126,6 +126,48 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
         assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
     }
 
+    @Test
+    void testBestLapTime() throws InterruptedException {
+        givenRunningState();
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+        sendStartingFrame();
+        Thread.sleep(2 * safeInterval);
+        sendAllFrames();
+        stopwatch.finish();
+        await().untilAsserted(() -> {
+            Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+            assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+            assertThat(lastMessage.getLaps(), equalTo(1));
+            assertThat(lastMessage.getLastLapTime(), equalTo(lastMessage.getBestLapTime()));
+            assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
+            assertTimeEquals(lastMessage.getBestLapTime(), stopwatch.getTime());
+        });
+
+
+        stopwatch.start();
+        sendAllFrames();
+        stopwatch.finish();
+        Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+        assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(lastMessage.getLaps(), equalTo(2));
+        assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
+        assertTimeEquals(lastMessage.getBestLapTime(), stopwatch.getTime());
+        assertThat(lastMessage.getLastLapTime(), equalTo(lastMessage.getBestLapTime()));
+
+        stopwatch.start();
+        Thread.sleep(safeInterval);
+        sendAllFrames();
+        stopwatch.finish();
+        lastMessage = shouldReceiveType(robot1, Type.LAP);
+        assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(lastMessage.getLaps(), equalTo(3));
+        assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
+        assertTimeEquals(lastMessage.getBestLapTime(), stopwatch.getTime());
+        assertThat(lastMessage.getBestLapTime(), lessThan(lastMessage.getLastLapTime()));
+    }
+
     private void assertTimeEquals(Long time, long expectedTime) {
         assertThat(time, greaterThanOrEqualTo(expectedTime - 100));
         assertThat(time, lessThanOrEqualTo(expectedTime + 100));

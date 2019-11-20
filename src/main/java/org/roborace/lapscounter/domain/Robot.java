@@ -25,6 +25,7 @@ public class Robot {
 
     private long currentLapStartTime;
     private long lastLapTime;
+    private long bestLapTime;
 
     private final List<Long> lapTimes = new ArrayList<>();
 
@@ -33,6 +34,9 @@ public class Robot {
         lapTimes.add(raceTime);
         lastLapTime = raceTime - currentLapStartTime;
         time = currentLapStartTime = raceTime;
+        if (lastLapTime < bestLapTime || bestLapTime == 0) {
+            bestLapTime = lastLapTime;
+        }
     }
 
     public void decLaps() {
@@ -41,7 +45,7 @@ public class Robot {
 
     public void reset() {
         laps = 0;
-        time = 0;
+        time = currentLapStartTime = lastLapTime = bestLapTime = 0;
     }
 
     public long extractLastLapTime() {
