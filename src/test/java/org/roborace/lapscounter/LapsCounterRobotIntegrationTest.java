@@ -108,8 +108,8 @@ class LapsCounterRobotIntegrationTest extends LapsCounterAbstractTest {
         robots.forEach(robot -> {
             int code = FIRST_SERIAL + robot.getName().charAt(1) - '0';
             sendMessage(robot, builder().type(Type.ROBOT_INIT).serial(code).build());
-            shouldReceiveLap(robots);
         });
+        robots.forEach(robot -> shouldReceiveLap(robots));
 
         sendCommandAndCheckState(STEADY);
         robots.forEach(robot -> shouldReceiveState(robot, STEADY));

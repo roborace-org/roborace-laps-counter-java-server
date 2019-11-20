@@ -30,7 +30,7 @@ public class LapsCounterService {
     }
 
 
-    public MessageResult handleMessage(Message message) {
+    public synchronized MessageResult handleMessage(Message message) {
 
         switch (message.getType()) {
             case COMMAND:

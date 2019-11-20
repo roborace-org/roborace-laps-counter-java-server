@@ -1,5 +1,6 @@
 package org.roborace.lapscounter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.MessageResult;
@@ -97,9 +98,18 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     private void sendObjectAsJson(Object message, WebSocketSession session) {
         try {
-            session.sendMessage(new TextMessage(JSON.writeValueAsString(message)));
+            sendObjectAsJson(new TextMessage(JSON.writeValueAsString(message)), session);
+        } catch (JsonProcessingException e) {
+            LOG.error("Error creating json message for object: {}. Reason: {}", message, e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private synchronized void sendObjectAsJson(TextMessage textMessage, WebSocketSession session) {
+        try {
+            session.sendMessage(textMessage);
         } catch (IOException e) {
-            LOG.error(String.format("Error while sending messages to ws client. Reason: %s", e.getMessage()), e);
+            LOG.error("Error while sending messages to ws client. Reason: {}", e.getMessage(), e);
         }
     }
 
