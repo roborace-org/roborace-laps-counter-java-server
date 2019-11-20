@@ -47,3 +47,8 @@ target/roborace-laps-counter.jar:
 
 service-update-jar: target/roborace-laps-counter.jar
 	cp target/roborace-laps-counter.jar /app/${PROJECT}/
+
+SERVER ?= pi@192.168.1.200
+scp-jar:
+	scp target/roborace-laps-counter.jar ${SERVER}:/app/roborace-laps-counter/
+
