@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
@@ -274,6 +275,7 @@ class LapsCounterServiceTest {
         givenRobotInits(101, 102);
         givenRaceState(State.RUNNING);
         when(frameProcessor.checkFrame(argThat(robot -> robot.getSerial() == 101), eq(FRAME), anyLong())).thenReturn(Type.FRAME);
+        when(frameProcessor.isStartFrame(eq(FRAME))).thenReturn(true);
 
         whenHandleMessage(aFrameMessage(101));
 
@@ -282,10 +284,16 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor).checkFrame(robotArgumentCaptor.capture(), eq(FRAME), anyLong());
+        Mockito.verify(frameProcessor).isStartFrame(eq(FRAME));
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Robot 101").num(1).place(1).laps(0).build()));
+        assertThat(actualRobot.getSerial(), equalTo(101));
+        assertThat(actualRobot.getName(), equalTo("Robot 101"));
+        assertThat(actualRobot.getNum(), equalTo(1));
+        assertThat(actualRobot.getPlace(), equalTo(1));
+        assertThat(actualRobot.getLaps(), equalTo(0));
+        assertThat(actualRobot.getCurrentLapStartTime(), greaterThan(0L));
     }
 
     @Test
@@ -305,7 +313,15 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        assertThat(actualRobot, equalTo(Robot.builder().serial(101).name("Robot 101").num(1).place(1).laps(1).time(raceTimeArgumentCaptor.getValue()).build()));
+        assertThat(actualRobot.getSerial(), equalTo(101));
+        assertThat(actualRobot.getName(), equalTo("Robot 101"));
+        assertThat(actualRobot.getNum(), equalTo(1));
+        assertThat(actualRobot.getPlace(), equalTo(1));
+        assertThat(actualRobot.getLaps(), equalTo(1));
+        Long time = raceTimeArgumentCaptor.getValue();
+        assertThat(actualRobot.getTime(), equalTo(time));
+        assertThat(actualRobot.getCurrentLapStartTime(), equalTo(time));
+        assertThat(actualRobot.getLastLapTime(), equalTo(time));
     }
 
     @Test
@@ -335,8 +351,14 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
 
         Robot actualRobot = robotArgumentCaptor.getValue();
-        Robot expected = Robot.builder().serial(102).name("Robot 102").num(2).place(1).laps(2).time(raceTimeArgumentCaptor.getValue()).build();
-        assertThat(actualRobot, equalTo(expected));
+        assertThat(actualRobot.getSerial(), equalTo(102));
+        assertThat(actualRobot.getName(), equalTo("Robot 102"));
+        assertThat(actualRobot.getNum(), equalTo(2));
+        assertThat(actualRobot.getPlace(), equalTo(1));
+        assertThat(actualRobot.getLaps(), equalTo(2));
+        Long time = raceTimeArgumentCaptor.getValue();
+        assertThat(actualRobot.getTime(), equalTo(time));
+        assertThat(actualRobot.getCurrentLapStartTime(), equalTo(time));
     }
 
     @Test

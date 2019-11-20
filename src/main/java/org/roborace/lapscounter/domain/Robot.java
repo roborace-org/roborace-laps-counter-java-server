@@ -23,11 +23,16 @@ public class Robot {
     private int laps;
     private long time;
 
+    private long currentLapStartTime;
+    private long lastLapTime;
+
     private final List<Long> lapTimes = new ArrayList<>();
 
     public void incLaps(long raceTime) {
         laps++;
         lapTimes.add(raceTime);
+        lastLapTime = raceTime - currentLapStartTime;
+        time = currentLapStartTime = raceTime;
     }
 
     public void decLaps() {

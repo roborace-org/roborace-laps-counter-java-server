@@ -188,6 +188,9 @@ public class LapsCounterService {
             List<Robot> robots = incLaps(robot, raceTime);
             return MessageResult.broadcast(getLapMessages(robots));
         } else if (frameType == Type.FRAME) {
+            if (frameProcessor.isStartFrame(message.getFrame())) {
+                robot.setCurrentLapStartTime(raceTime);
+            }
             return MessageResult.single(new Message(Type.FRAME));
         }
         return null;
@@ -195,7 +198,6 @@ public class LapsCounterService {
 
     private List<Robot> incLaps(Robot robot, long raceTime) {
         robot.incLaps(raceTime);
-        robot.setTime(raceTime);
         List<Robot> affectedRobots = sortRobotsByLapsAndTime();
         if (affectedRobots.isEmpty()) {
             affectedRobots.add(robot);
@@ -250,6 +252,7 @@ public class LapsCounterService {
         message.setLaps(robot.getLaps());
         message.setTime(robot.getTime());
         message.setPlace(robot.getPlace());
+        message.setLastLapTime(robot.getLastLapTime());
         return message;
     }
 

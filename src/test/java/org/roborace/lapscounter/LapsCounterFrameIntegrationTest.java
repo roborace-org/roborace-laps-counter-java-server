@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
+import org.roborace.lapscounter.service.Stopwatch;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.roborace.lapscounter.domain.Message.builder;
 
@@ -54,7 +55,7 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
         await().until(() -> robot1.hasMessageWithType(Type.LAP));
 
-        sendAllFrames();
+        sendStartingFrame();
 
         Thread.sleep(safeInterval);
 
@@ -83,6 +84,7 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     void testFrameSimple() throws InterruptedException {
         givenRunningState();
 
+        sendStartingFrame();
         sendAllFrames();
 
         await().untilAsserted(() -> {
@@ -96,8 +98,44 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
+    void testLastLapTime() throws InterruptedException {
+        givenRunningState();
+
+        Thread.sleep(2 * safeInterval);
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+        sendStartingFrame();
+        sendAllFrames();
+        stopwatch.finish();
+        await().untilAsserted(() -> {
+            Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+            assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+            assertThat(lastMessage.getLaps(), equalTo(1));
+            assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
+        });
+
+
+        stopwatch.start();
+        Thread.sleep(2 * safeInterval);
+        sendAllFrames();
+        stopwatch.finish();
+        Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+        assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(lastMessage.getLaps(), equalTo(2));
+        assertTimeEquals(lastMessage.getLastLapTime(), stopwatch.getTime());
+    }
+
+    private void assertTimeEquals(Long time, long expectedTime) {
+        assertThat(time, greaterThanOrEqualTo(expectedTime - 100));
+        assertThat(time, lessThanOrEqualTo(expectedTime + 100));
+    }
+
+    @Test
     void testFrameOneRobotSeveralLaps() throws InterruptedException {
         givenRunningState();
+
+        sendStartingFrame();
 
         AtomicInteger laps = new AtomicInteger(0);
         for (int i = 0; i < 3; i++) {
@@ -117,12 +155,14 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
     private void sendAllFrames() throws InterruptedException {
         Thread.sleep(2 * safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
-        Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_1);
         Thread.sleep(2 * safeInterval);
         sendFrame(robot1, FIRST_SERIAL, FRAME_2);
         Thread.sleep(2 * safeInterval);
+        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
+    }
+
+    private void sendStartingFrame() {
         sendFrame(robot1, FIRST_SERIAL, FRAME_0);
     }
 

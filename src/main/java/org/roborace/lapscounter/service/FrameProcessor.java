@@ -49,6 +49,10 @@ public class FrameProcessor {
         return frameResult;
     }
 
+    public boolean isStartFrame(Integer frame) {
+        return frames.get(0).equals(frame);
+    }
+
     private Type getFrameResult(Robot robot, Integer frame, long raceTime) {
         if (!frames.contains(frame)) {
             LOG.warn("Frame not found: {}, robot: {}", frame, robot.getSerial());
