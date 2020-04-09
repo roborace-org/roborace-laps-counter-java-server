@@ -18,8 +18,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Duration.FIVE_SECONDS;
-import static org.awaitility.Duration.ONE_MILLISECOND;
+import static org.awaitility.Durations.FIVE_SECONDS;
+import static org.awaitility.Durations.ONE_MILLISECOND;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.roborace.lapscounter.domain.Message.builder;
