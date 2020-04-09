@@ -114,7 +114,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Scheduled(fixedRate = 10000)
-    private void showStat() {
+    void showStat() {
         String clients = sessions.stream()
                 .map(session -> String.format("%s open:%s", session.getRemoteAddress(), session.isOpen()))
                 .collect(Collectors.joining(", "));
@@ -122,7 +122,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Scheduled(fixedRate = 10000)
-    private void scheduled() {
+    void scheduled() {
         Message scheduled = lapsCounterService.scheduled();
         if (scheduled != null) {
             broadcast(scheduled);

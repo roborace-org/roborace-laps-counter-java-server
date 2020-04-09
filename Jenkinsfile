@@ -25,5 +25,12 @@ pipeline {
                 sh 'make integration-tests'
             }
         }
+
+        stage('qa') {
+            steps {
+                sh 'make qa'
+            }
+        }
+
     }
 }
