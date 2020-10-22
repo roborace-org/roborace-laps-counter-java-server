@@ -31,9 +31,12 @@ public class Robot {
 
     public void incLaps(long raceTime) {
         laps++;
-        lapTimes.add(raceTime);
+        if (laps > 0) {
+            lapTimes.add(raceTime);
+            time = raceTime;
+        }
         lastLapTime = raceTime - currentLapStartTime;
-        time = currentLapStartTime = raceTime;
+        currentLapStartTime = raceTime;
         if (lastLapTime < bestLapTime || bestLapTime == 0) {
             bestLapTime = lastLapTime;
         }

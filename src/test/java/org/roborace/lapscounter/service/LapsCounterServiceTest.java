@@ -234,6 +234,9 @@ class LapsCounterServiceTest {
         Thread.sleep(100);
         Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
         whenHandleMessage(lapsInc);
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 1);
+        assertThatMessageHasLapWithLapsCount(messages.get(1), 101, 0, 2);
+
         Thread.sleep(50);
         Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
         whenHandleMessage(lapsDec);
@@ -242,6 +245,13 @@ class LapsCounterServiceTest {
         assertThatMessageHasLapWithLapsCount(messages.get(0), 101, 0, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(1), 102, 0, 2);
         assertThat(messages.get(1).getTime(), equalTo(0L));
+
+        Thread.sleep(50);
+        whenHandleMessage(lapsDec);
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, -1, 2);
+        assertThat(messages.get(0).getTime(), equalTo(0L));
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
@@ -265,6 +275,27 @@ class LapsCounterServiceTest {
         assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
         assertThatMessageHasLapWithLapsCount(messages.get(0), 102, 1, 1);
         assertThat(messages.get(0).getTime(), equalTo(firstLapTime));
+
+        Mockito.verify(frameProcessor).reset();
+        Mockito.verify(frameProcessor).robotInit(any(Robot.class));
+    }
+
+    @Test
+    void testLapManDecNegativeLapsHasZeroTime() throws InterruptedException {
+        givenRobotInits(102);
+        givenRaceState(State.RUNNING);
+
+        Thread.sleep(100);
+        Message lapsInc = Message.builder().type(Type.LAP_MAN).serial(102).laps(1).build();
+        Message lapsDec = Message.builder().type(Type.LAP_MAN).serial(102).laps(-1).build();
+
+        whenHandleMessage(lapsDec);
+        whenHandleMessage(lapsDec);
+        whenHandleMessage(lapsInc);
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
+        assertThatMessageHasLapWithLapsCount(messages.get(0), 102, -1, 1);
+        assertThat(messages.get(0).getTime(), equalTo(0L));
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor).robotInit(any(Robot.class));
