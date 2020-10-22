@@ -187,6 +187,9 @@ public class LapsCounterService {
         if (frameType == Type.LAP) {
             List<Robot> robots = incLaps(robot, raceTime);
             return MessageResult.broadcast(getLapMessages(robots));
+        } else if (frameType == Type.LAP_MINUS) {
+            List<Robot> robots = decLaps(robot);
+            return MessageResult.broadcast(getLapMessages(robots));
         } else if (frameType == Type.FRAME) {
             if (frameProcessor.isStartFrame(message.getFrame())) {
                 robot.setCurrentLapStartTime(raceTime);

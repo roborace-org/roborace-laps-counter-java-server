@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
@@ -51,20 +52,20 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
 
     @Test
-    void testFrameIgnoredIfStateNotRunning() throws InterruptedException {
+    void testFrameIgnoredIfStateNotRunning() {
 
         await().until(() -> robot1.hasMessageWithType(Type.LAP));
 
         sendStartingFrame();
 
-        Thread.sleep(safeInterval);
+        sleep(safeInterval);
 
         assertFalse(robot1.hasMessageWithType(Type.LAP));
 
     }
 
     @Test
-    void testFrameIgnoredFirstSeconds() throws InterruptedException {
+    void testFrameIgnoredFirstSeconds() {
 
         givenRunningState();
 
@@ -74,14 +75,14 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
         sendFrame(robot1, FIRST_SERIAL, FRAME_1);
         sendFrame(robot1, FIRST_SERIAL, FRAME_2);
 
-        Thread.sleep(safeInterval);
+        sleep(safeInterval);
 
         assertFalse(robot1.hasMessageWithType(Type.LAP));
 
     }
 
     @Test
-    void testFrameSimple() throws InterruptedException {
+    void testFrameSimple() {
         givenRunningState();
 
         sendStartingFrame();
@@ -98,10 +99,26 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
-    void testLastLapTime() throws InterruptedException {
+    void testFrameWrongRotation() {
         givenRunningState();
 
-        Thread.sleep(2 * safeInterval);
+        sendAllFramesWrongRotation();
+
+        await().untilAsserted(() -> {
+            Message lastMessage = shouldReceiveType(robot1, Type.LAP);
+            assertThat(lastMessage.getSerial(), equalTo(FIRST_SERIAL));
+            assertThat(lastMessage.getLaps(), equalTo(-1));
+        });
+
+        shouldReceiveType(ui, Type.LAP);
+
+    }
+
+    @Test
+    void testLastLapTime() {
+        givenRunningState();
+
+        sleep(2 * safeInterval);
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.start();
@@ -117,7 +134,7 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
 
         stopwatch.start();
-        Thread.sleep(2 * safeInterval);
+        sleep(2 * safeInterval);
         sendAllFrames();
         stopwatch.finish();
         Message lastMessage = shouldReceiveType(robot1, Type.LAP);
@@ -127,13 +144,13 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
-    void testBestLapTime() throws InterruptedException {
+    void testBestLapTime() {
         givenRunningState();
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.start();
         sendStartingFrame();
-        Thread.sleep(2 * safeInterval);
+        sleep(2 * safeInterval);
         sendAllFrames();
         stopwatch.finish();
         await().untilAsserted(() -> {
@@ -157,7 +174,7 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
         assertThat(lastMessage.getLastLapTime(), equalTo(lastMessage.getBestLapTime()));
 
         stopwatch.start();
-        Thread.sleep(safeInterval);
+        sleep(safeInterval);
         sendAllFrames();
         stopwatch.finish();
         lastMessage = shouldReceiveType(robot1, Type.LAP);
@@ -174,7 +191,7 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
-    void testFrameOneRobotSeveralLaps() throws InterruptedException {
+    void testFrameOneRobotSeveralLaps() {
         givenRunningState();
 
         sendStartingFrame();
@@ -195,13 +212,19 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
 
     }
 
-    private void sendAllFrames() throws InterruptedException {
-        Thread.sleep(2 * safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, FRAME_1);
-        Thread.sleep(2 * safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, FRAME_2);
-        Thread.sleep(2 * safeInterval);
-        sendFrame(robot1, FIRST_SERIAL, FRAME_0);
+    private void sendAllFrames() {
+        sendFrames(FRAME_1, FRAME_2, FRAME_0);
+    }
+
+    private void sendAllFramesWrongRotation() {
+        sendFrames(FRAME_2, FRAME_1, FRAME_0);
+    }
+
+    private void sendFrames(Integer... frames) {
+        Arrays.stream(frames).forEach(frame -> {
+            sleep(2 * safeInterval);
+            sendFrame(robot1, FIRST_SERIAL, frame);
+        });
     }
 
     private void sendStartingFrame() {
@@ -215,6 +238,14 @@ class LapsCounterFrameIntegrationTest extends LapsCounterAbstractTest {
                 .frame(frame)
                 .build();
         sendMessage(robot, message);
+    }
+
+    private void sleep(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
