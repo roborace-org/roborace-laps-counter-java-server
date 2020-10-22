@@ -53,7 +53,7 @@ class FrameProcessorTest {
         assertThat(frameProcessor.checkFrame(robot, FRAME_0, 1000), equalTo(FRAME));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 2000), equalTo(FRAME));
         frameProcessor.reset();
-        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 3000), equalTo(WRONG_FRAME));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_1, 3000), equalTo(WRONG_FRAME));
     }
 
 
@@ -71,9 +71,9 @@ class FrameProcessorTest {
 
     @Test
     void testFrameWrongRotate() {
-        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 1000), equalTo(WRONG_FRAME));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 1000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 2000), equalTo(WRONG_ROTATION));
-        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 3000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 3000), equalTo(LAP_MINUS));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 4000), equalTo(WRONG_ROTATION));
     }
 
@@ -85,25 +85,26 @@ class FrameProcessorTest {
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 4000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_0, 5000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 6000), equalTo(WRONG_ROTATION));
-        assertThat(frameProcessor.checkFrame(robot, FRAME_1, 6000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_1, 7000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 8000), equalTo(LAP_MINUS));
     }
 
     @Test
     void testFrameWrongRotateThreeLaps() {
-        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 1000), equalTo(WRONG_FRAME));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 1000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 2000), equalTo(WRONG_ROTATION));
-        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 3000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 3000), equalTo(LAP_MINUS));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 4000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 5000), equalTo(WRONG_ROTATION));
-        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 6000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 6000), equalTo(LAP_MINUS));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 7000), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 8000), equalTo(WRONG_ROTATION));
-        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 9000), equalTo(WRONG_ROTATION));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_0, 9000), equalTo(LAP_MINUS));
     }
 
     @Test
     void testThreeFrames() {
-        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 0), equalTo(WRONG_FRAME));
+        assertThat(frameProcessor.checkFrame(robot, FRAME_2, 0), equalTo(WRONG_ROTATION));
         assertThat(frameProcessor.checkFrame(robot, FRAME_0, 1000), equalTo(FRAME));
         assertThat(frameProcessor.checkFrame(robot, FRAME_1, 2000), equalTo(FRAME));
         assertThat(frameProcessor.checkFrame(robot, FRAME_2, 3000), equalTo(FRAME));

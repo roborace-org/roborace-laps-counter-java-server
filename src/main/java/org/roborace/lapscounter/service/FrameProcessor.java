@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FrameProcessor {
@@ -21,6 +23,7 @@ public class FrameProcessor {
 
     private final long safeInterval;
     private final List<Integer> frames;
+    private final List<Integer> reversedFrames;
 
     public FrameProcessor(@Value("${laps.safe-interval}") long safeInterval,
                           @Value("${laps.frames}") List<Integer> frames) {
@@ -29,6 +32,7 @@ public class FrameProcessor {
         if (frames.isEmpty()) {
             throw new RuntimeException("Frames are not detected");
         }
+        reversedFrames = frames.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
     public void robotInit(Robot robot) {
@@ -67,29 +71,44 @@ public class FrameProcessor {
         }
 
         List<Integer> robotFrames = frameRobotInfo.getFrames();
+        Integer lastFrame = frameRobotInfo.getLastFrame();
 
         if (isTooQuick(raceTime, frameRobotInfo.getLastFrameTime()) && !robotFrames.isEmpty()) {
             LOG.warn("Frame is not counted (too quick): {}, robot: {}", frame, robot.getSerial());
             return Type.ERROR;
         }
 
-        if (allFrames(frame, robotFrames)) {
+        boolean isFinishFrame = frame.equals(frames.get(0));
+
+        frameRobotInfo.placeFrame(raceTime, frame, isFinishFrame);
+
+        if (isFinishFrame) {
+
+            if (allFrames(robotFrames)) {
+                robotFrames.clear();
+                frameRobotInfo.placeFrame(raceTime, frame, true);
+                return Type.LAP;
+            }
+
+            if (allFramesWrongDirection(robotFrames)) {
+                robotFrames.clear();
+                frameRobotInfo.placeFrame(raceTime, frame, true);
+                return Type.LAP_MINUS;
+            }
+
             robotFrames.clear();
-            frameRobotInfo.placeFrame(raceTime, frame);
-            return Type.LAP;
+            frameRobotInfo.placeFrame(raceTime, frame, true);
         }
 
-        if (isNextRobotFrame(frame, frameRobotInfo.getLastFrame())) {
-            frameRobotInfo.placeFrame(raceTime, frame);
+        if (isNextRobotFrame(frame, lastFrame)) {
             return Type.FRAME;
         }
 
-        if (isLastRobotFrame(frame, frameRobotInfo.getLastFrame())) {
+        if (isLastRobotFrame(frame, lastFrame)) {
             return Type.DUPLICATE_FRAME;
         }
 
-        if (isPreviousRobotFrame(frame, frameRobotInfo.getLastFrame())) {
-            frameRobotInfo.removeLastFrame(frame);
+        if (isPreviousRobotFrame(frame, lastFrame)) {
             return Type.WRONG_ROTATION;
         }
 
@@ -111,16 +130,41 @@ public class FrameProcessor {
 
     private Integer getExpectedNextFrame(Integer lastFrame) {
         int lastFrameIndex = frames.indexOf(lastFrame);
-        return frames.get((lastFrameIndex + 1) % frames.size());
+        int nextIndex = (lastFrameIndex + 1) % frames.size();
+        return frames.get(nextIndex);
     }
 
     private Integer getExpectedPrevFrame(Integer lastFrame) {
         int lastFrameIndex = frames.indexOf(lastFrame);
-        return frames.get((lastFrameIndex - 1 + frames.size()) % frames.size());
+        if (lastFrameIndex == -1) lastFrameIndex = 0;
+        int prevIndex = (lastFrameIndex - 1 + frames.size()) % frames.size();
+        return frames.get(prevIndex);
     }
 
-    private boolean allFrames(Integer frame, List<Integer> robotFrames) {
-        return robotFrames.size() == frames.size() && frame.equals(frames.get(0));
+    private boolean allFrames(List<Integer> robotFrames) {
+        return hasSubsequence(robotFrames, frames);
+    }
+
+    private boolean allFramesWrongDirection(List<Integer> robotFrames) {
+        return hasSubsequence(robotFrames, reversedFrames);
+    }
+
+    private boolean hasSubsequence(List<Integer> robotFrames, List<Integer> search) {
+        int i = 0;
+        for (Integer frame : search) {
+            boolean found = false;
+            for (int j = i; j < robotFrames.size(); j++) {
+                if (frame.equals(robotFrames.get(j))) {
+                    i++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return robotFrames.size() >= 2;
     }
 
     private boolean isTooQuick(long raceTime, long lastFrameTime) {

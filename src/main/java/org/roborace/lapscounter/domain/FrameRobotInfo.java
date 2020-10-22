@@ -17,9 +17,13 @@ public class FrameRobotInfo {
     private long lastFrameTime;
     private Integer lastFrame;
 
-    public void placeFrame(long raceTime, Integer frame) {
+    public void placeFrame(long raceTime, Integer frame, boolean isFinishFrame) {
         setLastFrameTime(raceTime);
-        frames.add(frame);
+        if (!isFinishFrame && frames.contains(frame)) {
+            removeExtraFrames(frame);
+        } else {
+            frames.add(frame);
+        }
         lastFrame = frame;
     }
 
@@ -34,5 +38,13 @@ public class FrameRobotInfo {
         setLastFrameTime(0);
         frames.clear();
         lastFrame = null;
+    }
+
+    private void removeExtraFrames(Integer frame) {
+        int i = frames.indexOf(frame);
+        int sizeToLeave = i + 1;
+        while (frames.size() > sizeToLeave) {
+            frames.remove(sizeToLeave);
+        }
     }
 }

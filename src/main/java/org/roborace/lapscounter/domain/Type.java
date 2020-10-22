@@ -9,6 +9,7 @@ public enum Type {
     TIME,
     LAPS,
     LAP,
+    LAP_MINUS,
     LAP_MAN,
     FRAME,
     ERROR,
