@@ -106,6 +106,10 @@ abstract class LapsCounterAbstractTest {
         sendMessage(ui, Message.builder().type(Type.COMMAND).state(state).build());
     }
 
+    protected void sendTimeRequestCommand(long raceTimeLimit) {
+        sendMessage(ui, Message.builder().type(Type.TIME).raceTimeLimit(raceTimeLimit).build());
+    }
+
     protected void sendMessage(WebsocketClient client, Message message) {
         try {
             client.sendMessage(objectMapper.writeValueAsString(message));

@@ -19,6 +19,7 @@ public class LapsCounterService {
     private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
     private State state = READY;
+    private long raceStateLimit = 0;
     private final Stopwatch stopwatch = new Stopwatch();
     private final List<Robot> robots = new ArrayList<>();
 
@@ -44,7 +45,7 @@ public class LapsCounterService {
             case ROBOT_REMOVE:
                 return robotRemove(message);
             case TIME:
-                return MessageResult.single(getTime());
+                return timeRequest(message);
             case LAPS:
                 return new MessageResult(getLapMessages(robots), ResponseType.SINGLE);
             case LAP_MAN:
@@ -138,6 +139,14 @@ public class LapsCounterService {
         broadcast.add(message);
         broadcast.addAll(getLapMessages(sortRobotsByLapsAndTime()));
         return broadcast;
+    }
+
+    private MessageResult timeRequest(Message message) {
+        if (message.getRaceTimeLimit() != null) {
+            raceStateLimit = message.getRaceTimeLimit();
+            return MessageResult.broadcast(getTime());
+        }
+        return MessageResult.single(getTime());
     }
 
     private MessageResult lapManual(Message message) {
@@ -243,6 +252,7 @@ public class LapsCounterService {
         Message message = new Message();
         message.setType(Type.TIME);
         message.setTime(stopwatch.getTime());
+        message.setRaceTimeLimit(raceStateLimit);
         return message;
     }
 

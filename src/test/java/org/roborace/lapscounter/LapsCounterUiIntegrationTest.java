@@ -80,6 +80,7 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
 
         shouldReceiveType(ui, Type.TIME);
         assertThat(ui.getLastMessage().getTime(), lessThan(100L));
+        assertThat(ui.getLastMessage().getRaceTimeLimit(), is(0L));
 
         Thread.sleep(TIME_SEND_INTERVAL);
         shouldReceiveType(ui, Type.TIME);
@@ -89,6 +90,17 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
         shouldReceiveType(ui, Type.TIME);
         assertThat(ui.getLastMessage().getTime(), greaterThan(TIME_SEND_INTERVAL));
         assertThat(ui.getLastMessage().getTime(), lessThan(TIME_SEND_INTERVAL + 500));
+
+    }
+
+    @Test
+    void testSendRaceTimeLimit() {
+
+        sendTimeRequestCommand(3600L);
+
+        shouldReceiveType(ui, Type.TIME);
+        assertThat(ui.getLastMessage().getTime(), lessThan(100L));
+        assertThat(ui.getLastMessage().getRaceTimeLimit(), is(3600L));
 
     }
 
