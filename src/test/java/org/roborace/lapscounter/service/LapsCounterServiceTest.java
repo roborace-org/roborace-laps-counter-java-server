@@ -30,6 +30,8 @@ class LapsCounterServiceTest {
 
     @Mock
     private FrameProcessor frameProcessor;
+    @Mock
+    private LapsCounterScheduler lapsCounterScheduler;
 
     @InjectMocks
     private LapsCounterService lapsCounterService;
@@ -51,7 +53,7 @@ class LapsCounterServiceTest {
 
     @AfterEach
     void tearDown() {
-        Mockito.verifyNoMoreInteractions(frameProcessor);
+        Mockito.verifyNoMoreInteractions(frameProcessor, lapsCounterScheduler);
     }
 
     @Test
@@ -86,6 +88,9 @@ class LapsCounterServiceTest {
     void testCommandRunning() {
         givenRaceState(State.STEADY);
 
+        Message raceTimeLimitMessage = Message.builder().type(Type.TIME).raceTimeLimit(5L).build();
+        lapsCounterService.handleMessage(raceTimeLimitMessage);
+
         Message commandGo = aCommand(State.RUNNING);
         whenHandleMessage(commandGo);
 
@@ -94,6 +99,7 @@ class LapsCounterServiceTest {
         assertThatMessageHasTime(messages.get(1));
 
         Mockito.verify(frameProcessor).reset();
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(5L);
     }
 
     @Test
@@ -108,6 +114,7 @@ class LapsCounterServiceTest {
         assertThatMessageHasTime(messages.get(1));
 
         Mockito.verify(frameProcessor).reset();
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -208,6 +215,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -224,6 +232,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -255,6 +264,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -278,6 +288,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -299,6 +310,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -325,6 +337,7 @@ class LapsCounterServiceTest {
         assertThat(actualRobot.getPlace(), equalTo(1));
         assertThat(actualRobot.getLaps(), equalTo(0));
         assertThat(actualRobot.getCurrentLapStartTime(), greaterThan(0L));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     @Test
@@ -342,6 +355,7 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor).checkFrame(robotArgumentCaptor.capture(), eq(FRAME), raceTimeArgumentCaptor.capture());
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
 
         Robot actualRobot = robotArgumentCaptor.getValue();
         assertThat(actualRobot.getSerial(), equalTo(101));
@@ -380,6 +394,7 @@ class LapsCounterServiceTest {
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(frameProcessor, times(3)).checkFrame(robotArgumentCaptor.capture(), eq(FRAME), raceTimeArgumentCaptor.capture());
         Mockito.verify(frameProcessor, times(2)).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
 
         Robot actualRobot = robotArgumentCaptor.getValue();
         assertThat(actualRobot.getSerial(), equalTo(102));
@@ -443,6 +458,7 @@ class LapsCounterServiceTest {
         assertThat(scheduled.getTime(), Matchers.lessThan(50L));
 
         Mockito.verify(frameProcessor).reset();
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
     }
 
     private Robot aRobot(int serial, int place, int laps, long time) {

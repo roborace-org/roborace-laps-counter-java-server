@@ -105,6 +105,24 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
+    void testAutoFinishRaceByTimeLimit() {
+
+        long raceTimeLimit = 3L;
+        sendTimeRequestCommand(raceTimeLimit);
+        sendCommandAndCheckState(STEADY);
+
+        sendCommandAndCheckState(RUNNING);
+
+        shouldReceiveState(ui, FINISH);
+
+        shouldReceiveType(ui, Type.TIME);
+        assertThat(ui.getLastMessage().getTime(), greaterThanOrEqualTo(raceTimeLimit * 1000L));
+        assertThat(ui.getLastMessage().getTime(), lessThan(raceTimeLimit * 1000L + 100));
+        assertThat(ui.getLastMessage().getRaceTimeLimit(), is(raceTimeLimit));
+
+    }
+
+    @Test
     void testWrongCommand() {
         sendMessage(ui, Message.builder().type(Type.COMMAND).build());
         shouldReceiveType(ui, Type.ERROR);

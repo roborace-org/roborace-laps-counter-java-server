@@ -23,12 +23,10 @@ public class LapsCounterService {
     private final Stopwatch stopwatch = new Stopwatch();
     private final List<Robot> robots = new ArrayList<>();
 
-    private final FrameProcessor frameProcessor;
-
     @Autowired
-    public LapsCounterService(FrameProcessor frameProcessor) {
-        this.frameProcessor = frameProcessor;
-    }
+    private FrameProcessor frameProcessor;
+    @Autowired
+    private LapsCounterScheduler lapsCounterScheduler;
 
 
     public synchronized MessageResult handleMessage(Message message) {
@@ -88,6 +86,7 @@ public class LapsCounterService {
                 case RUNNING:
                     stopwatch.start();
                     messageResult.add(getTime());
+                    lapsCounterScheduler.addSchedulerForFinishRace(raceStateLimit);
                     break;
                 case FINISH:
                     stopwatch.finish();

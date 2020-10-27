@@ -2,14 +2,12 @@ package org.roborace.lapscounter.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.MessageResult;
 import org.roborace.lapscounter.domain.ResponseType;
 import org.roborace.lapscounter.domain.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -19,29 +17,24 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 
+@Slf4j
 @Component
 public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RoboraceWebSocketHandler.class);
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    private final LapsCounterService lapsCounterService;
-    private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-
     @Autowired
-    public RoboraceWebSocketHandler(LapsCounterService lapsCounterService) {
-        this.lapsCounterService = lapsCounterService;
-    }
+    private LapsCounterService lapsCounterService;
 
+    private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws IOException {
         try {
             String payload = textMessage.getPayload();
-            LOG.info("handleTextMessage {} {}", session.getRemoteAddress(), payload);
+            log.info("handleTextMessage {} {}", session.getRemoteAddress(), payload);
             Message message = JSON.readValue(payload, Message.class);
 
             MessageResult messageResult = lapsCounterService.handleMessage(message);
@@ -55,7 +48,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
                 singleSession(messageResult.getMessages(), session);
             }
         } catch (Exception e) {
-            LOG.error("Exception happen during message handling: {}", e.getMessage(), e);
+            log.error("Exception happen during message handling: {}", e.getMessage(), e);
             if (session.isOpen()) {
                 Message message = Message.builder().type(Type.ERROR).message(e.getMessage()).build();
                 sendObjectAsJson(message, session);
@@ -66,7 +59,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        LOG.info("ConnectionEstablished {}", session.getRemoteAddress());
+        log.info("ConnectionEstablished {}", session.getRemoteAddress());
         sessions.add(session);
 
         singleSession(lapsCounterService.afterConnectionEstablished(), session);
@@ -74,8 +67,12 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        LOG.info("ConnectionClosed {}", session.getRemoteAddress());
+        log.info("ConnectionClosed {}", session.getRemoteAddress());
         sessions.remove(session);
+    }
+
+    public List<WebSocketSession> getSessions() {
+        return sessions;
     }
 
     private void singleSession(List<Message> messages, WebSocketSession session) {
@@ -84,13 +81,13 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void broadcast(List<Message> messages) {
+    public void broadcast(List<Message> messages) {
         for (Message message : messages) {
             broadcast(message);
         }
     }
 
-    private void broadcast(Message message) {
+    public void broadcast(Message message) {
         sessions.stream()
                 .filter(WebSocketSession::isOpen)
                 .forEach(session -> sendObjectAsJson(message, session));
@@ -100,7 +97,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
         try {
             sendObjectAsJson(new TextMessage(JSON.writeValueAsString(message)), session);
         } catch (JsonProcessingException e) {
-            LOG.error("Error creating json message for object: {}. Reason: {}", message, e.getMessage(), e);
+            log.error("Error creating json message for object: {}. Reason: {}", message, e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -109,23 +106,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
         try {
             session.sendMessage(textMessage);
         } catch (IOException e) {
-            LOG.error("Error while sending messages to ws client. Reason: {}", e.getMessage(), e);
-        }
-    }
-
-    @Scheduled(fixedRate = 10000)
-    void showStat() {
-        String clients = sessions.stream()
-                .map(session -> String.format("%s open:%s", session.getRemoteAddress(), session.isOpen()))
-                .collect(Collectors.joining(", "));
-        LOG.info("Connected websocket clients: {}", clients);
-    }
-
-    @Scheduled(fixedRate = 10000)
-    void scheduled() {
-        Message scheduled = lapsCounterService.scheduled();
-        if (scheduled != null) {
-            broadcast(scheduled);
+            log.error("Error while sending messages to ws client. Reason: {}", e.getMessage(), e);
         }
     }
 }
