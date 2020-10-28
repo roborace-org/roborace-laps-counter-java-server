@@ -141,7 +141,7 @@ public class LapsCounterService {
     }
 
     private MessageResult timeRequest(Message message) {
-        if (message.getRaceTimeLimit() != null) {
+        if (message.getRaceTimeLimit() != null && state != RUNNING) {
             raceStateLimit = message.getRaceTimeLimit();
             return MessageResult.broadcast(getTime());
         }
