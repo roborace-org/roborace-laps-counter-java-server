@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -58,10 +61,7 @@ public class LapsCounterService {
     }
 
     public List<Message> afterConnectionEstablished() {
-        if (state == RUNNING) {
-            return Arrays.asList(getState(), getTime());
-        }
-        return Collections.singletonList(getState());
+        return Arrays.asList(getState(), getTime());
     }
 
     private MessageResult command(Message message) {

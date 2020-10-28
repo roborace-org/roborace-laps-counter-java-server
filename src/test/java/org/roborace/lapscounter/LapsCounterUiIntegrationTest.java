@@ -96,10 +96,14 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
     @Test
     void testSendRaceTimeLimit() {
 
+        shouldReceiveType(ui, Type.TIME);
+        assertThat(ui.getLastMessage().getTime(), is(0L));
+        assertThat(ui.getLastMessage().getRaceTimeLimit(), is(0L));
+
         sendTimeRequestCommand(3600L);
 
         shouldReceiveType(ui, Type.TIME);
-        assertThat(ui.getLastMessage().getTime(), lessThan(100L));
+        assertThat(ui.getLastMessage().getTime(), is(0L));
         assertThat(ui.getLastMessage().getRaceTimeLimit(), is(3600L));
 
     }
