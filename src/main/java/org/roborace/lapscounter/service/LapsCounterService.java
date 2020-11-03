@@ -92,6 +92,7 @@ public class LapsCounterService {
                 case FINISH:
                     stopwatch.finish();
                     messageResult.add(getTime());
+                    lapsCounterScheduler.removeSchedulerForFinishRace();
                     break;
             }
         }

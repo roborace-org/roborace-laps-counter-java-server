@@ -26,6 +26,8 @@ public class LapsCounterScheduler {
     @Autowired
     private LapsCounterService lapsCounterService;
 
+    private Timer timer;
+
     @Scheduled(fixedRate = 10000)
     void showStat() {
         String clients = webSocketHandler.getSessions().stream()
@@ -45,7 +47,8 @@ public class LapsCounterScheduler {
 
     public void addSchedulerForFinishRace(long raceStateLimit) {
         if (raceStateLimit > 0) {
-            new Timer().schedule(
+            timer = new Timer();
+            timer.schedule(
                     new TimerTask() {
                         @Override
                         public void run() {
@@ -56,6 +59,13 @@ public class LapsCounterScheduler {
                     },
                     TimeUnit.SECONDS.toMillis(raceStateLimit)
             );
+        }
+    }
+
+    public void removeSchedulerForFinishRace() {
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
         }
     }
 }

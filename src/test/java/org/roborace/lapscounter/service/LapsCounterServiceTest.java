@@ -115,6 +115,7 @@ class LapsCounterServiceTest {
 
         Mockito.verify(frameProcessor).reset();
         Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
+        Mockito.verify(lapsCounterScheduler).removeSchedulerForFinishRace();
     }
 
     @Test
