@@ -81,6 +81,7 @@ public class LapsCounterService {
                 case STEADY:
                     robots.forEach(Robot::reset);
                     frameProcessor.reset();
+                    sortRobotsByLapsAndTime();
                     messageResult.addAll(getLapMessages(robots));
                     break;
                 case RUNNING:
@@ -112,7 +113,7 @@ public class LapsCounterService {
             robot = new Robot();
             robot.setSerial(message.getSerial());
             robot.setName("Robot " + message.getSerial());
-            robot.setNum(robots.size() + 1);
+            robot.setNum(getNextNum());
             robot.setPlace(robots.size() + 1);
             robot.reset();
             robots.add(robot);
@@ -121,6 +122,10 @@ public class LapsCounterService {
         }
         LOG.info("Connected robots: {}", robots);
         return MessageResult.broadcast(getLap(robot));
+    }
+
+    private int getNextNum() {
+        return robots.stream().map(Robot::getNum).max(Integer::compareTo).orElse(0) + 1;
     }
 
     private MessageResult robotEdit(Message message) {
