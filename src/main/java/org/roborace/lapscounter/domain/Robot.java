@@ -49,6 +49,7 @@ public class Robot {
     public void reset() {
         laps = 0;
         time = currentLapStartTime = lastLapTime = bestLapTime = 0;
+        lapTimes.clear();
     }
 
     public long extractLastLapTime() {
