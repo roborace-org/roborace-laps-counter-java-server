@@ -1,8 +1,7 @@
 package org.roborace.lapscounter.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +14,9 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.comparingInt;
 import static org.roborace.lapscounter.domain.State.*;
 
-
+@Slf4j
 @Service
 public class LapsCounterService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LapsCounterService.class);
 
     private State state = READY;
     private long raceStateLimit = 0;
@@ -108,7 +105,7 @@ public class LapsCounterService {
         Optional<Robot> existing = getRobot(message.getSerial());
         Robot robot;
         if (existing.isPresent()) {
-            LOG.info("Reconnect robot {}", existing.get());
+            log.info("Reconnect robot {}", existing.get());
             robot = existing.get();
         } else {
             robot = new Robot();
@@ -119,9 +116,9 @@ public class LapsCounterService {
             robot.reset();
             robots.add(robot);
             frameProcessor.robotInit(robot);
-            LOG.info("Connect new robot {}", robot);
+            log.info("Connect new robot {}", robot);
         }
-        LOG.info("Connected robots: {}", robots);
+        log.debug("Connected robots: {}", robots);
         return MessageResult.broadcast(getLap(robot));
     }
 
@@ -131,7 +128,7 @@ public class LapsCounterService {
 
     private MessageResult robotEdit(Message message) {
         Robot robot = getRobotOrElseThrow(message.getSerial());
-        LOG.info("Edit robot {}", robot);
+        log.info("Edit robot {}", robot);
         robot.setName(message.getName());
         return MessageResult.broadcast(getLap(robot));
     }
@@ -156,7 +153,7 @@ public class LapsCounterService {
 
     private MessageResult lapManual(Message message) {
         if (state != RUNNING) {
-            LOG.info("Lap manual ignored: state is not running");
+            log.info("Lap manual ignored: state is not running");
             throw new LapsCounterException("Lap manual ignored: state is not running");
         }
         if (message.getLaps() == null) {
@@ -191,7 +188,7 @@ public class LapsCounterService {
 
     private MessageResult frame(Message message) {
         if (state != RUNNING) {
-            LOG.info("Frame ignored: state is not running");
+            log.debug("Frame ignored: state is not running");
             return null;
         }
         Robot robot = getRobotOrElseThrow(message.getSerial());
@@ -240,7 +237,7 @@ public class LapsCounterService {
 
     public Message scheduled() {
         if (state == RUNNING) {
-            LOG.info("Send time");
+            log.debug("Send time");
             return getTime();
         }
         return null;

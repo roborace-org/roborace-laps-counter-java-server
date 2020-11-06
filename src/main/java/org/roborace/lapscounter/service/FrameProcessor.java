@@ -1,10 +1,9 @@
 package org.roborace.lapscounter.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.FrameRobotInfo;
 import org.roborace.lapscounter.domain.Robot;
 import org.roborace.lapscounter.domain.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FrameProcessor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FrameProcessor.class);
 
     private final Map<Integer, FrameRobotInfo> frameInfoBySerialMap = new HashMap<>();
 
@@ -49,7 +47,7 @@ public class FrameProcessor {
 
     public Type checkFrame(Robot robot, Integer frame, long raceTime) {
         Type frameResult = getFrameResult(robot, frame, raceTime);
-        LOG.info("Frame result: {}, {}, robot: {}", frameResult, frame, robot.getSerial());
+        log.info("Frame result: {}, {}, robot: {}", frameResult, frame, robot.getSerial());
         return frameResult;
     }
 
@@ -59,14 +57,14 @@ public class FrameProcessor {
 
     private Type getFrameResult(Robot robot, Integer frame, long raceTime) {
         if (!frames.contains(frame)) {
-            LOG.warn("Frame not found: {}, robot: {}", frame, robot.getSerial());
+            log.warn("Frame not found: {}, robot: {}", frame, robot.getSerial());
             return Type.ERROR;
         }
 
         FrameRobotInfo frameRobotInfo = frameInfoBySerialMap.get(robot.getSerial());
 
         if (frameRobotInfo == null) {
-            LOG.warn("Robot [{}] is not init", robot.getSerial());
+            log.warn("Robot [{}] is not init", robot.getSerial());
             return Type.ERROR;
         }
 
@@ -74,7 +72,7 @@ public class FrameProcessor {
         Integer lastFrame = frameRobotInfo.getLastFrame();
 
         if (isTooQuick(raceTime, frameRobotInfo.getLastFrameTime()) && !robotFrames.isEmpty()) {
-            LOG.warn("Frame is not counted (too quick): {}, robot: {}", frame, robot.getSerial());
+            log.warn("Frame is not counted (too quick): {}, robot: {}", frame, robot.getSerial());
             return Type.ERROR;
         }
 
