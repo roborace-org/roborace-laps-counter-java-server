@@ -39,4 +39,19 @@ class StopwatchTest {
         assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 10));
     }
 
+    @Test
+    void testReset() throws InterruptedException {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+        Thread.sleep(DELAY);
+        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 10));
+
+        stopwatch.finish();
+        assertThat(stopwatch.getTime(), lessThanOrEqualTo(DELAY + 10));
+
+        stopwatch.reset();
+        Thread.sleep(DELAY);
+        assertThat(stopwatch.getTime(), is(0L));
+    }
+
 }

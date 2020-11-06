@@ -19,6 +19,10 @@ public class Stopwatch {
     public void finish() {
         endTime = millis();
     }
+    public void reset() {
+        startTime = 0;
+        endTime = 0;
+    }
 
     private long millis() {
         return System.currentTimeMillis();

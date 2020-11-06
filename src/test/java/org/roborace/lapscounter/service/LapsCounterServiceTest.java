@@ -71,7 +71,7 @@ class LapsCounterServiceTest {
         Message command = aCommand(State.STEADY);
         whenHandleMessage(command);
 
-        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
         assertThatMessageHasState(messages.get(0), State.STEADY);
         Mockito.verify(frameProcessor).reset();
     }

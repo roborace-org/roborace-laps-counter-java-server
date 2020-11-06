@@ -81,21 +81,21 @@ public class LapsCounterService {
                 case STEADY:
                     robots.forEach(Robot::reset);
                     frameProcessor.reset();
+                    stopwatch.reset();
                     sortRobotsByLapsAndTime();
                     messageResult.addAll(getLapMessages(robots));
                     break;
                 case RUNNING:
                     stopwatch.start();
-                    messageResult.add(getTime());
                     lapsCounterScheduler.addSchedulerForFinishRace(raceStateLimit);
                     break;
                 case FINISH:
                     stopwatch.finish();
-                    messageResult.add(getTime());
                     lapsCounterScheduler.removeSchedulerForFinishRace();
                     break;
             }
         }
+        messageResult.add(getTime());
         return messageResult;
     }
 
