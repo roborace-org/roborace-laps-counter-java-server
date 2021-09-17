@@ -19,7 +19,7 @@ run-jar: build-no-tests
 	java -jar target/*.jar
 
 release:
-	mvn -B release:prepare release:perform
+	mvn -B release:prepare release:perform -Darguments="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true"
 
 
 PROJECT = roborace-laps-counter
