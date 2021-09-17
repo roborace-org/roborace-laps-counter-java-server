@@ -4,7 +4,7 @@
 
     <groupId>org.roborace</groupId>
     <artifactId>roborace-laps-counter</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -122,7 +122,7 @@
         <url>scm:git:git@github.com:roborace-org/roborace-laps-counter-java-server.git</url>
         <connection>scm:git:git@github.com:roborace-org/roborace-laps-counter-java-server.git</connection>
         <developerConnection>scm:git:git@github.com:roborace-org/roborace-laps-counter-java-server.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>roborace-laps-counter-1.0.1</tag>
     </scm>
 
 </project>
