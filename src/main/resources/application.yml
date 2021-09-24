@@ -4,3 +4,4 @@ server:
 laps:
   safe-interval: 1000
   frames: 0xAA00, 0xAA01, 0xAA02
+  pit-stop-time: 60000

@@ -3,6 +3,7 @@ package org.roborace.lapscounter.service;
 import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,8 +19,11 @@ import static org.roborace.lapscounter.domain.State.*;
 @Service
 public class LapsCounterService {
 
+    @Value("${laps.pit-stop-time}")
+    private long pitStopTime;
+
     private State state = READY;
-    private long raceStateLimit = 0;
+    private long raceTimeLimit = 0;
     private final Stopwatch stopwatch = new Stopwatch();
     private final List<Robot> robots = new ArrayList<>();
 
@@ -48,6 +52,8 @@ public class LapsCounterService {
                 return new MessageResult(getLapMessages(robots), ResponseType.SINGLE);
             case LAP_MAN:
                 return lapManual(message);
+            case PIT_STOP:
+                return pitStop(message);
             case FRAME:
                 return frame(message);
             case LAP:
@@ -84,7 +90,7 @@ public class LapsCounterService {
                     break;
                 case RUNNING:
                     stopwatch.start();
-                    lapsCounterScheduler.addSchedulerForFinishRace(raceStateLimit);
+                    lapsCounterScheduler.addSchedulerForFinishRace(raceTimeLimit);
                     break;
                 case FINISH:
                     stopwatch.finish();
@@ -145,7 +151,7 @@ public class LapsCounterService {
 
     private MessageResult timeRequest(Message message) {
         if (message.getRaceTimeLimit() != null && state != RUNNING) {
-            raceStateLimit = message.getRaceTimeLimit();
+            raceTimeLimit = message.getRaceTimeLimit();
             return MessageResult.broadcast(getTime());
         }
         return MessageResult.single(getTime());
@@ -184,6 +190,19 @@ public class LapsCounterService {
             }
         }
         return affectedRobots;
+    }
+
+    private MessageResult pitStop(Message message) {
+        if (state != RUNNING) {
+            log.debug("PitStop ignored: state is not running");
+            throw new LapsCounterException("PitStop ignored: state is not running");
+        }
+        Robot robot = getRobotOrElseThrow(message.getSerial());
+
+        robot.setPitStopFinishTime(stopwatch.getTime() + pitStopTime);
+        log.info("Used PIT_STOP for robot: {}", robot.getSerial());
+
+        return MessageResult.broadcast(getLap(robot));
     }
 
     private MessageResult frame(Message message) {
@@ -254,7 +273,7 @@ public class LapsCounterService {
         Message message = new Message();
         message.setType(Type.TIME);
         message.setTime(stopwatch.getTime());
-        message.setRaceTimeLimit(raceStateLimit);
+        message.setRaceTimeLimit(raceTimeLimit);
         return message;
     }
 
@@ -267,6 +286,7 @@ public class LapsCounterService {
         message.setLaps(robot.getLaps());
         message.setTime(robot.getTime());
         message.setBestLapTime(robot.getBestLapTime());
+        message.setPitStopFinishTime(robot.getPitStopFinishTime());
         message.setLastLapTime(robot.getLastLapTime());
         message.setPlace(robot.getPlace());
         return message;

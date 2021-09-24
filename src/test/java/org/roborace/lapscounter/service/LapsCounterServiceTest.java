@@ -17,8 +17,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 class LapsCounterServiceTest {
 
     private static final int FRAME = 0xAA00;
+    public static final int PIT_STOP_TEST_TIME = 1230;
 
     @Mock
     private FrameProcessor frameProcessor;
@@ -48,7 +49,7 @@ class LapsCounterServiceTest {
 
     @BeforeEach
     void setUp() {
-
+        ReflectionTestUtils.setField(lapsCounterService, "pitStopTime", PIT_STOP_TEST_TIME);
     }
 
     @AfterEach
@@ -409,6 +410,24 @@ class LapsCounterServiceTest {
     }
 
     @Test
+    void testPitStopShowTime() throws Exception {
+        givenRobotInits(101);
+        givenRaceState(State.RUNNING);
+
+        Thread.sleep(100);
+        Message pitStop = Message.builder().type(Type.PIT_STOP).serial(101).build();
+        whenHandleMessage(pitStop);
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
+        assertThatMessageHasLap(messages.get(0), 101);
+        assertTimeEquals(messages.get(0).getPitStopFinishTime(), 100 + PIT_STOP_TEST_TIME);
+
+        Mockito.verify(frameProcessor).reset();
+        Mockito.verify(frameProcessor).robotInit(any(Robot.class));
+        Mockito.verify(lapsCounterScheduler).addSchedulerForFinishRace(0L);
+    }
+
+    @Test
     void testSortRobotsByLapsAndTime() {
         Robot first = aRobot(101, 1, 2, 2);
         Robot second = aRobot(102, 2, 2, 5);
@@ -533,5 +552,10 @@ class LapsCounterServiceTest {
         assertThat(message.getSerial(), equalTo(serial));
         assertThat(message.getLaps(), equalTo(laps));
         assertThat(message.getPlace(), equalTo(place));
+    }
+
+    private void assertTimeEquals(Long time, long expectedTime) {
+        assertThat(time, greaterThanOrEqualTo(expectedTime));
+        assertThat(time, lessThanOrEqualTo(expectedTime + 100));
     }
 }

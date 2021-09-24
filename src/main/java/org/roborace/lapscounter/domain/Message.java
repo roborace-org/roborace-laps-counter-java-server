@@ -29,6 +29,7 @@ public class Message {
     private Long raceTimeLimit;
     private Long lastLapTime;
     private Long bestLapTime;
+    private Long pitStopFinishTime;
     private Integer place;
 
     private String message;

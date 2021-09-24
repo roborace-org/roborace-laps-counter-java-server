@@ -11,6 +11,7 @@ public enum Type {
     LAP,
     LAP_MINUS,
     LAP_MAN,
+    PIT_STOP,
     FRAME,
     ERROR,
     WRONG_FRAME,
