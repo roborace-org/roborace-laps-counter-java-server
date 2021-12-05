@@ -70,6 +70,19 @@ class LapsCounterRobotIntegrationTest extends LapsCounterAbstractTest {
     }
 
     @Test
+    void testRobotInitWithName() {
+
+        sendMessage(robot1, builder().type(Type.ROBOT_INIT).serial(FIRST_SERIAL).name("MyCool Name").build());
+
+        shouldReceiveType(robot1, Type.LAP);
+        assertThat(robot1.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
+
+        shouldReceiveType(ui, Type.LAP);
+        assertThat(ui.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
+        assertThat(ui.getLastMessage().getName(), equalTo("MyCool Name"));
+    }
+
+    @Test
     void testRobotEdit() {
 
         sendMessage(robot1, builder().type(Type.ROBOT_INIT).serial(FIRST_SERIAL).build());

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
+import static java.util.Optional.ofNullable;
 import static org.roborace.lapscounter.domain.State.*;
 
 @Slf4j
@@ -116,7 +117,7 @@ public class LapsCounterService {
         } else {
             robot = new Robot();
             robot.setSerial(message.getSerial());
-            robot.setName("Robot " + message.getSerial());
+            robot.setName(ofNullable(message.getName()).orElse("Robot " + message.getSerial()));
             robot.setNum(getNextNum());
             robot.setPlace(robots.size() + 1);
             robot.reset();
@@ -293,7 +294,7 @@ public class LapsCounterService {
     }
 
     private Robot getRobotOrElseThrow(Integer serial) {
-        return Optional.ofNullable(serial)
+        return ofNullable(serial)
                 .flatMap(this::getRobot)
                 .orElseThrow(() -> new LapsCounterException("Cannot find robot by serial"));
     }
