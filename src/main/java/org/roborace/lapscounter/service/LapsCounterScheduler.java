@@ -33,7 +33,7 @@ public class LapsCounterScheduler {
         String clients = webSocketHandler.getSessions().stream()
                 .map(session -> String.format("%s open:%s", session.getRemoteAddress(), session.isOpen()))
                 .collect(Collectors.joining(", "));
-        log.info("Connected websocket clients: {}", clients);
+        log.debug("Connected websocket clients: {}", clients);
     }
 
     @Scheduled(fixedRate = 10000)

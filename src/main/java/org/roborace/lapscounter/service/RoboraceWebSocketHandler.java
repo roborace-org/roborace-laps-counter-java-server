@@ -59,7 +59,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        log.info("ConnectionEstablished {}", session.getRemoteAddress());
+        log.debug("ConnectionEstablished {}", session.getRemoteAddress());
         sessions.add(session);
 
         singleSession(lapsCounterService.afterConnectionEstablished(), session);
@@ -67,7 +67,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        log.info("ConnectionClosed {}", session.getRemoteAddress());
+        log.debug("ConnectionClosed {}", session.getRemoteAddress());
         sessions.remove(session);
     }
 
