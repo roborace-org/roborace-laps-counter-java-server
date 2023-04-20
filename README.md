@@ -11,24 +11,18 @@ roborace-laps-counter - это система, предназначенная д
 
 ## Установка на Raspberry pi / Ubuntu Linux
 
-Необходимо установить openjdk-8 на сервер и добавить линукс сервис: 
+Необходимо установить jdk-11 или новее: 
 > sudo apt update
 > sudo apt upgrade
-> sudo apt install -y openjdk-8-jre
-> sudo make service-install
+> sudo apt install -y openjdk-11
 
-Далее необходимо скачать jar-файл и загрузить его в каталог /app/roborace-laps-counter/roborace-laps-counter.jar либо собрать jar-файл самостоятельно
+
+Далее необходимо скачать jar-файл либо собрать jar-файл самостоятельно
 
 Для того чтобы запустить сервис:
-> sudo service roborace-laps-counter start
+> java -jar roborace-laps-counter.jar
 
 ### Сборка jar-файла
 
-> sudo apt install -y openjdk-8-jdk maven
+> sudo apt install -y openjdk-11-jdk maven
 > make build
-
-### Обновление jar-файла в сервисе
-
-> service roborace-laps-counter stop
-> make service-update-jar
-> service roborace-laps-counter start
