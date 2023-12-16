@@ -2,6 +2,7 @@ package org.roborace.lapscounter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.websocket.DeploymentException;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,7 +13,6 @@ import org.roborace.lapscounter.domain.State;
 import org.roborace.lapscounter.domain.Type;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

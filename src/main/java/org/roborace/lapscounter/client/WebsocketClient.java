@@ -1,10 +1,18 @@
 package org.roborace.lapscounter.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -18,7 +26,7 @@ public class WebsocketClient {
     private final String name;
     private Session userSession = null;
 
-    private List<Message> messages = new ArrayList<>();
+    private final List<Message> messages = new ArrayList<>();
     private Message lastMessage;
 
     public WebsocketClient(URI endpointURI, String name) throws IOException, DeploymentException {
