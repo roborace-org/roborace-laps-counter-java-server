@@ -7,7 +7,6 @@ import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.MessageResult;
 import org.roborace.lapscounter.domain.ResponseType;
 import org.roborace.lapscounter.domain.Type;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -25,13 +24,16 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    @Autowired
-    private LapsCounterService lapsCounterService;
+    private final LapsCounterService lapsCounterService;
 
     private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
+    public RoboraceWebSocketHandler(LapsCounterService lapsCounterService) {
+        this.lapsCounterService = lapsCounterService;
+    }
+
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws IOException {
+    public void handleTextMessage(WebSocketSession session, TextMessage textMessage) {
         try {
             String payload = textMessage.getPayload();
             log.info("handleTextMessage {} {}", session.getRemoteAddress(), payload);
@@ -51,7 +53,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
             log.error("Exception happen during message handling: {}", e.getMessage(), e);
             if (session.isOpen()) {
                 Message message = Message.builder().type(Type.ERROR).message(e.getMessage()).build();
-                sendObjectAsJson(message, session);
+                sendTextMessage(convert(message), session);
             }
         }
     }
@@ -77,7 +79,7 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
 
     private void singleSession(List<Message> messages, WebSocketSession session) {
         for (Message message : messages) {
-            sendObjectAsJson(message, session);
+            sendTextMessage(convert(message), session);
         }
     }
 
@@ -88,21 +90,22 @@ public class RoboraceWebSocketHandler extends TextWebSocketHandler {
     }
 
     public void broadcast(Message message) {
+        TextMessage textMessage = convert(message);
         sessions.stream()
                 .filter(WebSocketSession::isOpen)
-                .forEach(session -> sendObjectAsJson(message, session));
+                .forEach(session -> sendTextMessage(textMessage, session));
     }
 
-    private void sendObjectAsJson(Object message, WebSocketSession session) {
+    private TextMessage convert(Object message) {
         try {
-            sendObjectAsJson(new TextMessage(JSON.writeValueAsString(message)), session);
+            return new TextMessage(JSON.writeValueAsString(message));
         } catch (JsonProcessingException e) {
             log.error("Error creating json message for object: {}. Reason: {}", message, e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
 
-    private synchronized void sendObjectAsJson(TextMessage textMessage, WebSocketSession session) {
+    private synchronized void sendTextMessage(TextMessage textMessage, WebSocketSession session) {
         try {
             session.sendMessage(textMessage);
         } catch (IOException e) {
