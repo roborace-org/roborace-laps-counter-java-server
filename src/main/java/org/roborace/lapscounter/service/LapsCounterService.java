@@ -38,32 +38,19 @@ public class LapsCounterService {
 
     public synchronized MessageResult handleMessage(Message message) {
 
-        switch (message.getType()) {
-            case COMMAND:
-                return command(message);
-            case STATE:
-                return MessageResult.single(getState());
-            case ROBOT_INIT:
-                return robotInit(message);
-            case ROBOT_EDIT:
-                return robotEdit(message);
-            case ROBOT_REMOVE:
-                return robotRemove(message);
-            case TIME:
-                return timeRequest(message);
-            case LAPS:
-                return new MessageResult(getLapMessages(robots), ResponseType.SINGLE);
-            case LAP_MAN:
-                return lapManual(message);
-            case PIT_STOP:
-                return pitStop(message);
-            case FRAME:
-                return frame(message);
-            case LAP:
-            case ERROR:
-            default:
-                throw new LapsCounterException("Method not supported: [" + message.getType() + "]");
-        }
+        return switch (message.getType()) {
+            case COMMAND -> command(message);
+            case STATE -> MessageResult.single(getState());
+            case ROBOT_INIT -> robotInit(message);
+            case ROBOT_EDIT -> robotEdit(message);
+            case ROBOT_REMOVE -> robotRemove(message);
+            case TIME -> timeRequest(message);
+            case LAPS -> new MessageResult(getLapMessages(robots), ResponseType.SINGLE);
+            case LAP_MAN -> lapManual(message);
+            case PIT_STOP -> pitStop(message);
+            case FRAME -> frame(message);
+            default -> throw new LapsCounterException("Method not supported: [" + message.getType() + "]");
+        };
     }
 
     public List<Message> afterConnectionEstablished() {
@@ -84,21 +71,24 @@ public class LapsCounterService {
             state = parsedState;
             messageResult.add(getState());
             switch (state) {
-                case STEADY:
+                case READY -> {
+                    stopwatch.reset();
                     robots.forEach(Robot::reset);
                     frameProcessor.reset();
-                    stopwatch.reset();
                     sortRobotsByLapsAndTime();
                     messageResult.addAll(getLapMessages(robots));
-                    break;
-                case RUNNING:
+                }
+                case STEADY -> {
+
+                }
+                case RUNNING -> {
                     stopwatch.start();
                     lapsCounterScheduler.addSchedulerForFinishRace(raceTimeLimit);
-                    break;
-                case FINISH:
+                }
+                case FINISH -> {
                     stopwatch.finish();
                     lapsCounterScheduler.removeSchedulerForFinishRace();
-                    break;
+                }
             }
         }
         messageResult.add(getTime());

@@ -82,10 +82,7 @@ abstract class LapsCounterAbstractTest {
     }
 
     private void givenReadyState() {
-        shouldReceiveType(ui, Type.STATE);
-        if (ui.getLastMessage().getState() != READY) {
-            sendCommandAndCheckState(READY);
-        }
+        shouldReceiveState(ui, READY);
     }
     protected void givenRunningState() {
         sendCommandAndCheckState(State.STEADY);
