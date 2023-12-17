@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.roborace.lapscounter.domain.State.FINISH;
@@ -26,7 +25,7 @@ public class LapsCounterScheduler {
     @Autowired
     private LapsCounterService lapsCounterService;
 
-    private Timer timer;
+    private Timer timer = new Timer();
 
     @Scheduled(fixedRate = 10000)
     void showStat() {
@@ -45,27 +44,38 @@ public class LapsCounterScheduler {
     }
 
 
-    public void addSchedulerForFinishRace(long raceStateLimit) {
-        if (raceStateLimit > 0) {
-            timer = new Timer();
-            timer.schedule(
-                    new TimerTask() {
-                        @Override
-                        public void run() {
-                            MessageResult command = lapsCounterService.handleMessage(FINISH_MESSAGE);
-                            webSocketHandler.broadcast(command.getMessages());
-                            log.info("Race is finished by time limit");
-                        }
-                    },
-                    TimeUnit.SECONDS.toMillis(raceStateLimit)
-            );
-        }
+    public void addSchedulerForFinishRace(long delayMs) {
+        addScheduler(() -> {
+            MessageResult command = lapsCounterService.handleMessage(FINISH_MESSAGE);
+            webSocketHandler.broadcast(command.getMessages());
+            log.info("Race is finished by time limit");
+        }, delayMs);
     }
 
-    public void removeSchedulerForFinishRace() {
+    public void addSchedulerForPitStop(Message message, long delayMs) {
+        addScheduler(() -> {
+            webSocketHandler.broadcast(message);
+            log.info("Pit stop is finished");
+        }, delayMs);
+    }
+
+    public void addScheduler(Runnable runnable, long delayMs) {
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        runnable.run();
+                    }
+                },
+                delayMs
+        );
+    }
+
+    public void resetSchedulers() {
         if (timer != null) {
             timer.cancel();
             timer.purge();
+            timer = new Timer();
         }
     }
 }

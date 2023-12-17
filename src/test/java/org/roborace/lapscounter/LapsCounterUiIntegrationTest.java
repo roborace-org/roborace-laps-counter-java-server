@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.roborace.lapscounter.client.WebsocketClient;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.Type;
+import org.roborace.lapscounter.service.LapsCounterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,8 +25,15 @@ import static org.roborace.lapscounter.domain.State.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
 
+    public static final long PIT_STOP_TEST_TIME = 1230;
+
+    @Autowired
+    private LapsCounterService lapsCounterService;
+
     @BeforeEach
     void setUp() {
+
+        ReflectionTestUtils.setField(lapsCounterService, "pitStopTime", PIT_STOP_TEST_TIME);
 
     }
 
@@ -124,6 +134,16 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
         assertThat(ui.getLastMessage().getTime(), lessThan(raceTimeLimit * 1000L + 100));
         assertThat(ui.getLastMessage().getRaceTimeLimit(), is(raceTimeLimit));
 
+    }
+
+    @Test
+    void testReceivePitStopFinish() {
+        WebsocketClient robot1 = createAndInitRobot("ROBOT1", FIRST_SERIAL);
+        givenRunningState();
+
+        sendMessage(robot1, Message.builder().serial(FIRST_SERIAL).type(Type.PIT_STOP).build());
+
+        shouldReceiveType(ui, Type.PIT_STOP_FINISH);
     }
 
     @Test

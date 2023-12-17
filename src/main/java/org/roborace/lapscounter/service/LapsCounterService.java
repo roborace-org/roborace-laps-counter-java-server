@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
@@ -83,11 +84,13 @@ public class LapsCounterService {
                 }
                 case RUNNING -> {
                     stopwatch.start();
-                    lapsCounterScheduler.addSchedulerForFinishRace(raceTimeLimit);
+                    if (raceTimeLimit > 0) {
+                        lapsCounterScheduler.addSchedulerForFinishRace(TimeUnit.SECONDS.toMillis(raceTimeLimit));
+                    }
                 }
                 case FINISH -> {
                     stopwatch.finish();
-                    lapsCounterScheduler.removeSchedulerForFinishRace();
+                    lapsCounterScheduler.resetSchedulers();
                 }
             }
         }
@@ -194,6 +197,12 @@ public class LapsCounterService {
 
         robot.setPitStopFinishTime(stopwatch.getTime() + pitStopTime);
         log.info("Used PIT_STOP for robot: {}", robot.getSerial());
+
+        Message pitStopFinish = Message.builder()
+                .type(Type.PIT_STOP_FINISH)
+                .serial(robot.getSerial())
+                .build();
+        lapsCounterScheduler.addSchedulerForPitStop(pitStopFinish, pitStopTime);
 
         return MessageResult.broadcast(getLap(robot));
     }
