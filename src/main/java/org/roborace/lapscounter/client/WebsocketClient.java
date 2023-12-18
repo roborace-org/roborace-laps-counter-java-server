@@ -11,12 +11,13 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import org.roborace.lapscounter.domain.Message;
+import org.roborace.lapscounter.domain.State;
 import org.roborace.lapscounter.domain.Type;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @ClientEndpoint
 public class WebsocketClient {
@@ -26,8 +27,9 @@ public class WebsocketClient {
     private final String name;
     private Session userSession = null;
 
-    private final List<Message> messages = new ArrayList<>();
+    private final Queue<Message> messages = new ConcurrentLinkedQueue<>();
     private Message lastMessage;
+    private State state;
 
     public WebsocketClient(URI endpointURI, String name) throws IOException, DeploymentException {
         this.name = name;
@@ -71,16 +73,27 @@ public class WebsocketClient {
         }
     }
 
+    public Message pollMessage() {
+        return messages.poll();
+    }
+
     public boolean hasMessage() {
         return !messages.isEmpty();
     }
+    public boolean hasNoMessage() {
+        return messages.isEmpty();
+    }
 
     public boolean hasMessageWithType(Type type) {
-        if (!hasMessage()) {
+        if (messages.isEmpty()) {
             return false;
         }
-        lastMessage = messages.remove(0);
-        return lastMessage.getType() == type;
+        lastMessage = messages.poll();
+        boolean result = lastMessage.getType() == type;
+        if (result && type == Type.STATE) {
+            state = lastMessage.getState();
+        }
+        return result;
     }
 
     public Message getLastMessage() {
@@ -89,5 +102,9 @@ public class WebsocketClient {
 
     public String getName() {
         return name;
+    }
+
+    public State getState() {
+        return state;
     }
 }

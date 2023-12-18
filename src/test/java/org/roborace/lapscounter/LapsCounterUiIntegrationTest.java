@@ -174,7 +174,7 @@ class LapsCounterUiIntegrationTest extends LapsCounterAbstractTest {
         WebsocketClient robot1 = createAndInitRobot("ROBOT1", FIRST_SERIAL);
         assertThat(ui.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
         assertThat(robot1.getLastMessage().getSerial(), equalTo(FIRST_SERIAL));
-        await().until(() -> !robot1.hasMessage());
+        await().until(robot1::hasNoMessage);
 
 
         WebsocketClient robot2 = createAndInitRobot("ROBOT2", SECOND_SERIAL);
