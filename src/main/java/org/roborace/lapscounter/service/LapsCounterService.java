@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static org.roborace.lapscounter.domain.State.*;
@@ -55,7 +56,7 @@ public class LapsCounterService {
     }
 
     public List<Message> afterConnectionEstablished() {
-        return Arrays.asList(getState(), getTime());
+        return asList(getState(), getTime());
     }
 
     private MessageResult command(Message message) {
@@ -198,13 +199,18 @@ public class LapsCounterService {
         robot.setPitStopFinishTime(stopwatch.getTime() + pitStopTime);
         log.info("Used PIT_STOP for robot: {}", robot.getSerial());
 
+        Message pitStopStart = Message.builder()
+                .type(Type.PIT_STOP)
+                .serial(robot.getSerial())
+                .build();
+
         Message pitStopFinish = Message.builder()
                 .type(Type.PIT_STOP_FINISH)
                 .serial(robot.getSerial())
                 .build();
         lapsCounterScheduler.addSchedulerForPitStop(pitStopFinish, pitStopTime);
 
-        return MessageResult.broadcast(getLap(robot));
+        return MessageResult.broadcast(asList(pitStopStart, getLap(robot)));
     }
 
     private MessageResult frame(Message message) {

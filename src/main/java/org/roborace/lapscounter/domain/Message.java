@@ -27,8 +27,11 @@ public class Message {
     private Integer laps;
     private Long time;
     private Long raceTimeLimit;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long lastLapTime;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long bestLapTime;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long pitStopFinishTime;
     private Integer place;
 

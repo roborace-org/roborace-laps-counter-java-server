@@ -399,9 +399,11 @@ class LapsCounterServiceTest {
         Message pitStop = Message.builder().type(Type.PIT_STOP).serial(101).build();
         whenHandleMessage(pitStop);
 
-        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 1);
-        assertThatMessageHasLap(messages.get(0), 101);
-        assertTimeEquals(messages.get(0).getPitStopFinishTime(), 100 + PIT_STOP_TEST_TIME);
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2);
+        assertThat(messages.get(0).getType(), equalTo(Type.PIT_STOP));
+        assertThat(messages.get(0).getSerial(), equalTo(101));
+        assertThatMessageHasLap(messages.get(1), 101);
+        assertTimeEquals(messages.get(1).getPitStopFinishTime(), 100 + PIT_STOP_TEST_TIME);
 
         verify(lapsCounterScheduler).addSchedulerForPitStop(any(Message.class), eq(PIT_STOP_TEST_TIME));
         verify(frameProcessor).robotInit(any(Robot.class));
