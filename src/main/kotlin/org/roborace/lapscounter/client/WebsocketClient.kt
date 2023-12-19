@@ -17,6 +17,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.URI
+import java.time.LocalDateTime
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -26,7 +27,7 @@ class WebsocketClient(endpointURI: URI, val name: String) {
     private val userSession: Session = ContainerProvider.getWebSocketContainer()
         .connectToServer(this, endpointURI)
 
-    private val messages: Queue<Message> = ConcurrentLinkedQueue()
+    private val messages: Queue<MessageWithTime> = ConcurrentLinkedQueue()
 
     var lastMessage: Message = Message(type = Type.ERROR)
     var state: State? = null
@@ -47,9 +48,10 @@ class WebsocketClient(endpointURI: URI, val name: String) {
     }
 
     @OnMessage
-    fun onMessage(message: String) {
-        log.info("[{}] Message received = [{}]", name, message)
-        messages.add(objectMapper.readValue(message, Message::class.java))
+    fun onMessage(text: String) {
+        log.info("[{}] Message received = [{}]", name, text)
+        val message = objectMapper.readValue(text, Message::class.java)
+        messages.add(MessageWithTime(message))
     }
 
     fun sendMessage(message: String) {
@@ -68,21 +70,39 @@ class WebsocketClient(endpointURI: URI, val name: String) {
         }
     }
 
-    fun pollMessage(): Message = messages.poll()
+    fun pollMessage(): Message = messages.poll().message
+
+    fun pollFreshMessage(freshSeconds: Long): Message? {
+        while (!messages.isEmpty()) {
+            val messageWithTime = messages.poll()
+            if (messageWithTime.isFreshMessage(freshSeconds)) {
+                return messageWithTime.message
+            }
+        }
+        return null
+    }
 
     fun hasMessage() = messages.isNotEmpty()
+
+    fun hasFreshMessage(freshSeconds: Long): Boolean =
+        messages.firstOrNull { m: MessageWithTime -> m.isFreshMessage(freshSeconds) } != null
 
     fun hasNoMessages(): Boolean = messages.isEmpty()
 
     fun hasMessageWithType(type: Type): Boolean {
         while (messages.isNotEmpty()) {
-            lastMessage = messages.poll()
+            lastMessage = messages.poll().message
             if (lastMessage.type == Type.STATE) {
                 state = lastMessage.state
             }
             if (lastMessage.type == type) return true
         }
         return false
+    }
+
+    internal data class MessageWithTime(val message: Message, val time: LocalDateTime = LocalDateTime.now()) {
+        fun isFreshMessage(freshSeconds: Long) =
+            time.isAfter(LocalDateTime.now().minusSeconds(freshSeconds))
     }
 
     companion object {
