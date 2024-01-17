@@ -1,14 +1,14 @@
 package org.roborace.lapscounter.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -19,9 +19,10 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static org.roborace.lapscounter.domain.State.*;
 
-@Slf4j
 @Service
 public class LapsCounterService {
+
+    public static final Logger log = LoggerFactory.getLogger(LapsCounterService.class);
 
     @Value("${laps.pit-stop-time}")
     private long pitStopTime;

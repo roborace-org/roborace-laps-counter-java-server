@@ -1,9 +1,10 @@
 package org.roborace.lapscounter.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.FrameRobotInfo;
 import org.roborace.lapscounter.domain.Robot;
 import org.roborace.lapscounter.domain.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class FrameProcessor {
+
+    public static final Logger log = LoggerFactory.getLogger(FrameProcessor.class);
 
     private final Map<Integer, FrameRobotInfo> frameInfoBySerialMap = new HashMap<>();
 

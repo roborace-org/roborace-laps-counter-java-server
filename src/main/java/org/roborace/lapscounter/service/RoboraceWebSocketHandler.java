@@ -2,11 +2,12 @@ package org.roborace.lapscounter.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.roborace.lapscounter.domain.Message;
 import org.roborace.lapscounter.domain.MessageResult;
 import org.roborace.lapscounter.domain.ResponseType;
 import org.roborace.lapscounter.domain.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -18,9 +19,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
-@Slf4j
 @Component
 public class RoboraceWebSocketHandler extends TextWebSocketHandler {
+
+    public static final Logger log = LoggerFactory.getLogger(RoboraceWebSocketHandler.class);
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
