@@ -1,0 +1,13 @@
+{
+  "__url": "event/program/stage/add",
+  "program_id": 6576,
+  "name": "Квалификация",
+  "type_start": 1,
+  "type_final": 0,
+  "quota": 0,
+  "count_single": 3,
+  "challonge_type": null,
+  "judging_type": null,
+  "hidden_results": false,
+  "formula": "{\"name\":\"Круги\",\"params\":[{\"id\":\"Laps\",\"name\":\"Кол-во кругов\",\"type\":\"number\"},{\"id\":\"Time\",\"name\":\"Время\",\"type\":\"time\"}],\"results\":[{\"formula\":\"[p0]\",\"name\":\"Круги\",\"type\":\"number\"},{\"formula\":\"[p1]\",\"name\":\"Время\",\"type\":\"time\"}],\"sort\":\"0:desc,1:asc\",\"disq_reasons\":\"Не уложился в заданное время круга\"}"
+}
