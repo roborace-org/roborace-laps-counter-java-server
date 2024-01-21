@@ -1,0 +1,19 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "display_id": "BID-97178",
+      "id": 97178,
+      "name": "робот тест",
+      "status": 6,
+      "organizations": [],
+      "program_stages": [
+        {
+          "display_id": "EPS-8922",
+          "id": 8922
+        }
+      ]
+    }
+  ]
+}

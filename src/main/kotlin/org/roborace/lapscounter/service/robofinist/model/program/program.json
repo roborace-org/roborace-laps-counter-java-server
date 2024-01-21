@@ -1,0 +1,49 @@
+ {
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "display_id": "EPR-6520",
+      "id": 6520,
+      "event_id": 1015,
+      "name": "Roborace PRO Mini",
+      "description": "<p>Соревнования Roborace во многом похожи на соревнования Формулы 1, но с тем отличием, что соревнуются не управляемые пилотами болиды, а полностью автономные роботы. Роботы полагаются на показания своих датчиков, чтобы ориентироваться по трассе (ограниченной бортами), маневрировать, выбирать скорость движения и избегать столкновений с соперниками.</p>",
+      "regulations_id": 2397,
+      "is_tournament": 1,
+      "check_unique_participant": 1,
+      "max_robot": 1,
+      "min_participant": 1,
+      "max_participant": 2,
+      "arRequiredRobotsFields": [
+        "file_image_id",
+        "content"
+      ],
+      "sort": 0,
+      "created": "2024-01-03 15:35:24",
+      "updated": "0000-00-00 00:00:00",
+      "name_en": null,
+      "haveTerritory": true,
+      "description_en": null,
+      "compatiblePrograms": [
+        {
+          "display_id": "EPR-6530",
+          "id": 6530,
+          "name": "FIRA Challenge - Autonomous Cars"
+        }
+      ],
+      "image": {
+        "display_id": "FILE-193090",
+        "id": "193090",
+        "mime_type": "image/jpeg",
+        "original_name": "rr-mini.jpeg",
+        "file_size": "111583",
+        "height": 791,
+        "width": 950,
+        "is_public": 1,
+        "timestamp_x": "2024-01-03 15:35:24",
+        "url": "/files/193090/filename/rr-mini.jpeg"
+      },
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "__url": "event/program/create",
+  "event_id": "1025",
+  "is_tournament": 1,
+  "regulations_id": 2397,
+  "name": "Roborace PRO Mini",
+  "description": "<p>Соревнования Roborace во многом похожи на соревнования Формулы 1, но с тем отличием, что соревнуются не управляемые пилотами болиды, а полностью автономные роботы. Роботы полагаются на показания своих датчиков, чтобы ориентироваться по трассе (ограниченной бортами), маневрировать, выбирать скорость движения и избегать столкновений с соперниками.</p>",
+  "name_en": "",
+  "description_en": "",
+  "max_robot": 1,
+  "min_participant": "1",
+  "max_participant": "2",
+  "check_unique_participant": 0,
+  "arRequiredRobotsFields": [
+    "file_image_id",
+    "content"
+  ],
+  "sort": 101
+}

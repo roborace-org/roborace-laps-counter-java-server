@@ -1,0 +1,53 @@
+{
+  "errors": [],
+  "code": 201,
+  "data": {
+    "display_id": "EPS-8903",
+    "id": 8903,
+    "name": "Квалификация",
+    "quota": 0,
+    "bid_robot": 1,
+    "count_bids": 0,
+    "program_id": 6576,
+    "challonge_type": null,
+    "status": 0,
+    "statusLabel": "Открыта регистрация",
+    "type_start": 1,
+    "type_final": 0,
+    "started_at": "2024-01-20 22:33:36",
+    "match_time": 60,
+    "count_single": 3,
+    "judging_type": null,
+    "arFormula": {
+      "name": "Круги",
+      "params": [
+        {
+          "id": "Laps",
+          "name": "Кол-во кругов",
+          "type": "number"
+        },
+        {
+          "id": "Time",
+          "name": "Время",
+          "type": "time"
+        }
+      ],
+      "results": [
+        {
+          "formula": "[p0]",
+          "name": "Круги",
+          "type": "number"
+        },
+        {
+          "formula": "[p1]",
+          "name": "Время",
+          "type": "time"
+        }
+      ],
+      "sort": "0:desc,1:asc",
+      "disq_reasons": "Не уложился в заданное время круга"
+    },
+    "grounds": 1,
+    "hidden_results": 0
+  }
+}
