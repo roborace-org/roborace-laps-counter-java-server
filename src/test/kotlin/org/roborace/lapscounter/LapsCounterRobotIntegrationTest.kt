@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.annotation.DirtiesContext.ClassMode
+import java.lang.Thread.sleep
 import kotlin.random.Random
 
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -22,6 +23,7 @@ internal class LapsCounterRobotIntegrationTest : LapsCounterAbstractTest() {
 
     @BeforeEach
     fun setUp() {
+        sleep(50)
         robot1 = createClient("ROBOT1")
         shouldReceiveState(robot1, State.READY)
     }

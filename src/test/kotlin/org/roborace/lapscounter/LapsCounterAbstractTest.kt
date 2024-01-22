@@ -14,8 +14,8 @@ import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import java.lang.Thread.sleep
 import java.net.URI
-import java.util.concurrent.TimeUnit
 
 internal abstract class LapsCounterAbstractTest {
     @Value("\${local.server.port}")
@@ -29,6 +29,7 @@ internal abstract class LapsCounterAbstractTest {
 
     @BeforeEach
     fun setUpAbstract() {
+        sleep(50)
         ui = createClient("UI").also {
             givenReadyState(it)
         }
@@ -89,13 +90,13 @@ internal abstract class LapsCounterAbstractTest {
         const val SECOND_SERIAL: Int = 101
 
         private fun wsServer(port: Int) = "ws://localhost:$port/ws"
-        const val TIME_SEND_INTERVAL: Long = 2000L
+        const val TIME_SEND_INTERVAL: Long = 3000L
 
         @JvmStatic
         @BeforeAll
         fun beforeAllAbstract() {
             Awaitility.setDefaultTimeout(Durations.FIVE_SECONDS)
-            Awaitility.setDefaultPollInterval(10, TimeUnit.MILLISECONDS)
+            Awaitility.setDefaultPollInterval(Durations.ONE_MILLISECOND)
         }
     }
 }

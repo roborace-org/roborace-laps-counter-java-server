@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.annotation.DirtiesContext.ClassMode
 import java.lang.Thread.sleep
+import kotlin.math.min
 
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = ["laps.safe-interval=100"])
@@ -167,7 +168,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
         assertThat(lastMessage.laps, equalTo(3))
         assertTimeEquals(lastMessage.lastLapTime!!, stopwatch3.time())
-        assertTimeEquals(lastMessage.bestLapTime!!, stopwatch3.time())
+        assertTimeEquals(lastMessage.bestLapTime!!, min(stopwatch2.time(), stopwatch3.time()))
         assertThat(lastMessage.bestLapTime, Matchers.lessThan(lastMessage.lastLapTime!!))
     }
 

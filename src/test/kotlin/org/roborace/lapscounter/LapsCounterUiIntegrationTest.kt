@@ -4,7 +4,6 @@ import org.awaitility.Awaitility
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.lessThan
@@ -16,10 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.annotation.DirtiesContext.ClassMode
+import java.lang.Thread.sleep
 
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
-    properties = ["laps.pit-stop-time=1230", "laps.time-send-interval:2000"])
+    properties = ["laps.pit-stop-time=1230", "laps.time-send-interval:3000"])
 internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
 
     @Test
@@ -64,13 +64,18 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
         assertThat(ui.lastMessage.time, lessThan(100L))
         assertThat(ui.lastMessage.raceTimeLimit, `is`(0L))
 
+        sleep(TIME_SEND_INTERVAL - 1000)
         shouldReceiveType(ui, Type.TIME)
+        assertThat(ui.lastMessage.time, equalTo(TIME_SEND_INTERVAL))
 
-//        assertThat(ui.lastMessage.time, equalTo(TIME_SEND_INTERVAL));
+        sleep(TIME_SEND_INTERVAL - 1000)
+        shouldReceiveType(ui, Type.TIME)
+        assertThat(ui.lastMessage.time, equalTo(2 * TIME_SEND_INTERVAL))
+
         sendCommandAndCheckState(State.FINISH)
         shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, greaterThan(TIME_SEND_INTERVAL - 500))
-        assertThat(ui.lastMessage.time, lessThan(TIME_SEND_INTERVAL + 500))
+        assertThat(ui.lastMessage.time, greaterThanOrEqualTo(2 * TIME_SEND_INTERVAL))
+        assertThat(ui.lastMessage.time, lessThan(2 * TIME_SEND_INTERVAL + 20))
     }
 
     @Test

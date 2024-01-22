@@ -28,13 +28,6 @@ class LapsCounterScheduler(
         }
     }
 
-    @Scheduled(fixedRateString = "\${laps.time-send-interval:10000}")
-    fun scheduled() {
-        lapsCounterService.scheduled()?.let {
-            webSocketHandler.broadcast(it)
-        }
-    }
-
     fun addSchedulerForFinishRace(delayMs: Long) {
         addScheduler(delayMs) {
             val messageResult = lapsCounterService.handleMessage(FINISH_MESSAGE)

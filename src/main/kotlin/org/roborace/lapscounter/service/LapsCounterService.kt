@@ -30,7 +30,7 @@ class LapsCounterService(
 
     private var state = State.READY
     private var raceTimeLimit: Long = 0
-    private val stopwatch = Stopwatch()
+    val stopwatch = Stopwatch()
     private val robots: MutableList<Robot> = mutableListOf()
 
 
