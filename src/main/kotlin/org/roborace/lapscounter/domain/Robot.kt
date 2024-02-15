@@ -11,9 +11,9 @@ data class Robot(
     private val lapTimes: MutableList<Long> = mutableListOf()
 
     var currentLapStartTime: Long = 0
-    var lastLapTime: Long? = null
+    var lastLapTime: Long = 0
 
-    var bestLapTime: Long? = null
+    var bestLapTime: Long = 0
 
     var pitStopFinishTime: Long? = null
 
@@ -25,7 +25,7 @@ data class Robot(
         }
         lastLapTime = raceTime - currentLapStartTime
         currentLapStartTime = raceTime
-        if (bestLapTime == null || lastLapTime!! < bestLapTime!!) {
+        if (bestLapTime == 0L || lastLapTime < bestLapTime) {
             bestLapTime = lastLapTime
         }
     }
@@ -40,8 +40,8 @@ data class Robot(
         laps = 0
         time = 0
         lapTimes.clear()
-        bestLapTime = null
-        lastLapTime = null
+        bestLapTime = 0
+        lastLapTime = 0
         currentLapStartTime = 0
         pitStopFinishTime = null
     }

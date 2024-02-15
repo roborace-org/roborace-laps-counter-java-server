@@ -2,10 +2,7 @@ package org.roborace.lapscounter
 
 import org.awaitility.Awaitility
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.greaterThanOrEqualTo
-import org.hamcrest.Matchers.lessThanOrEqualTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -118,7 +115,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
             val lastMessage = shouldReceiveType(robot1, Type.LAP)
             assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
             assertThat(lastMessage.laps, equalTo(1))
-            assertTimeEquals(lastMessage.lastLapTime!!, stopwatch.time())
+            assertTimeEquals(lastMessage.lastLapTime, stopwatch.time())
         }
 
 
@@ -128,7 +125,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         val lastMessage = shouldReceiveType(robot1, Type.LAP)
         assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
         assertThat(lastMessage.laps, equalTo(2))
-        assertTimeEquals(lastMessage.lastLapTime!!, stopwatch2.time())
+        assertTimeEquals(lastMessage.lastLapTime, stopwatch2.time())
     }
 
     @Test
@@ -142,34 +139,37 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         stopwatch.finish()
         val stopwatch2 = Stopwatch().start()
         Awaitility.await().untilAsserted {
-            val lastMessage = shouldReceiveType(robot1, Type.LAP)
-            assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-            assertThat(lastMessage.laps, equalTo(1))
-            assertThat(lastMessage.lastLapTime, equalTo(lastMessage.bestLapTime))
-            assertTimeEquals(lastMessage.lastLapTime!!, stopwatch.time())
-            assertTimeEquals(lastMessage.bestLapTime!!, stopwatch.time())
+            shouldReceiveType(robot1, Type.LAP).also {
+                assertThat(it.serial, equalTo(FIRST_SERIAL))
+                assertThat(it.laps, equalTo(1))
+                assertThat(it.lastLapTime, equalTo(it.bestLapTime))
+                assertTimeEquals(it.lastLapTime, stopwatch.time())
+                assertTimeEquals(it.bestLapTime, stopwatch.time())
+            }
         }
 
 
         sendAllFrames()
         stopwatch2.finish()
         val stopwatch3 = Stopwatch().start()
-        var lastMessage = shouldReceiveType(robot1, Type.LAP)
-        assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(lastMessage.laps, equalTo(2))
-        assertTimeEquals(lastMessage.lastLapTime!!, stopwatch2.time())
-        assertTimeEquals(lastMessage.bestLapTime!!, stopwatch2.time())
-        assertThat(lastMessage.lastLapTime, equalTo(lastMessage.bestLapTime))
+        shouldReceiveType(robot1, Type.LAP).also {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.laps, equalTo(2))
+            assertTimeEquals(it.lastLapTime, stopwatch2.time())
+            assertTimeEquals(it.bestLapTime, stopwatch2.time())
+            assertThat(it.lastLapTime, equalTo(it.bestLapTime))
+        }
 
         sleep(safeInterval)
         sendAllFrames()
         stopwatch3.finish()
-        lastMessage = shouldReceiveType(robot1, Type.LAP)
-        assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(lastMessage.laps, equalTo(3))
-        assertTimeEquals(lastMessage.lastLapTime!!, stopwatch3.time())
-        assertTimeEquals(lastMessage.bestLapTime!!, min(stopwatch2.time(), stopwatch3.time()))
-        assertThat(lastMessage.bestLapTime, Matchers.lessThan(lastMessage.lastLapTime!!))
+        shouldReceiveType(robot1, Type.LAP).also {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.laps, equalTo(3))
+            assertTimeEquals(it.lastLapTime, stopwatch3.time())
+            assertTimeEquals(it.bestLapTime, min(stopwatch2.time(), stopwatch3.time()))
+            assertThat(it.bestLapTime, lessThan(it.lastLapTime))
+        }
     }
 
     private fun assertTimeEquals(time: Long, expectedTime: Long) {
