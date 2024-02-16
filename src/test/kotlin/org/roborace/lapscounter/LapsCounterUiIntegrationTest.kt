@@ -3,10 +3,7 @@ package org.roborace.lapscounter
 import org.awaitility.Awaitility
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.greaterThanOrEqualTo
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.lessThan
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.domain.Type
@@ -95,15 +92,13 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
     fun testAutoFinishRaceByTimeLimit() {
         val raceTimeLimit = 3L
         sendTimeRequestCommand(raceTimeLimit)
-        sendCommandAndCheckState(State.STEADY)
-
-        sendCommandAndCheckState(State.RUNNING)
+        givenRunningState()
 
         shouldReceiveState(ui, State.FINISH)
 
         shouldReceiveType(ui, Type.TIME)
         assertThat(ui.lastMessage.time, greaterThanOrEqualTo(raceTimeLimit * 1000L))
-        assertThat(ui.lastMessage.time, lessThan(raceTimeLimit * 1000L + 100))
+        assertThat(ui.lastMessage.time, `is`(raceTimeLimit * 1000L))
         assertThat(ui.lastMessage.raceTimeLimit, `is`(raceTimeLimit))
     }
 

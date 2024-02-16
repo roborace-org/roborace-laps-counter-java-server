@@ -22,16 +22,18 @@ class LapsCounterScheduler(
     fun showStat() {
         webSocketHandler.getSessionsCopy()
             .joinToString(", ") {
-            "${it.remoteAddress} open:${it.isOpen}"
-        }.also {
-            log.debug("Connected websocket clients: {}", it)
-        }
+                "${it.remoteAddress} open:${it.isOpen}"
+            }.also {
+                log.debug("Connected websocket clients: {}", it)
+            }
     }
 
     fun addSchedulerForFinishRace(delayMs: Long) {
         addScheduler(delayMs) {
-            val messageResult = lapsCounterService.handleMessage(FINISH_MESSAGE)
-            webSocketHandler.broadcast(messageResult.messages)
+            while (lapsCounterService.stopwatch.time() < delayMs) Thread.yield()
+            lapsCounterService.handleMessage(FINISH_MESSAGE).also {
+                webSocketHandler.broadcast(it.messages)
+            }
             log.info("Race is finished by time limit")
         }
     }
@@ -50,7 +52,7 @@ class LapsCounterScheduler(
                     runnable.run()
                 }
             },
-            delayMs
+            delayMs - 10
         )
     }
 
@@ -63,6 +65,6 @@ class LapsCounterScheduler(
     companion object {
         private val log: Logger = LoggerFactory.getLogger(LapsCounterService::class.java)
 
-        private val FINISH_MESSAGE: Message = Message(Type.COMMAND, state = State.FINISH)
+        private val FINISH_MESSAGE = Message(Type.COMMAND, state = State.FINISH)
     }
 }
