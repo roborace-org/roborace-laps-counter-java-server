@@ -10,7 +10,6 @@ import io.mockk.slot
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.hamcrest.Matchers.hasSize
@@ -420,7 +419,8 @@ internal class LapsCounterServiceTest {
     @Test
     fun testScheduleIfNotStarted() {
         val scheduled = lapsCounterService.scheduled()
-        assertThat(scheduled, nullValue())
+        assertThat(scheduled.type, equalTo(Type.TIME))
+        assertThat(scheduled.time, equalTo(0L))
     }
 
     @Test
@@ -428,7 +428,7 @@ internal class LapsCounterServiceTest {
         givenRaceState(State.RUNNING)
 
         val scheduled = lapsCounterService.scheduled()
-        assertThat(scheduled!!.type, equalTo(Type.TIME))
+        assertThat(scheduled.type, equalTo(Type.TIME))
         assertThat(scheduled.time, greaterThanOrEqualTo(0L))
         assertThat(scheduled.time, lessThan(50L))
     }

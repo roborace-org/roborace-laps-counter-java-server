@@ -240,12 +240,10 @@ class LapsCounterService(
 
     private fun getLapMessages(robots: List<Robot>) = robots.map { getLap(it) }
 
-    fun scheduled(): Message? =
-        if (state == State.RUNNING) {
-            timeMessage().also {
-                log.debug("Send time")
-            }
-        } else null
+    fun scheduled(): Message =
+        timeMessage().also {
+            log.debug("Send time")
+        }
 
     fun getState(): Message = Message(Type.STATE, state = state)
 
