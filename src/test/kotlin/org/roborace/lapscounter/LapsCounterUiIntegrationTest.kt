@@ -7,10 +7,12 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.lessThan
+import org.hamcrest.Matchers.lessThanOrEqualTo
 import org.junit.jupiter.api.Test
 import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
+import org.roborace.lapscounter.service.util.Stopwatch
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.test.annotation.DirtiesContext
@@ -43,6 +45,17 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
     }
 
     @Test
+    fun testFinishContinue() {
+        sendCommandAndCheckState(State.STEADY)
+
+        sendCommandAndCheckState(State.RUNNING)
+
+        sendCommandAndCheckState(State.FINISH)
+
+        sendCommandAndCheckState(State.RUNNING)
+    }
+
+    @Test
     fun testStateUi() {
         sendState()
         shouldReceiveState(ui, State.READY)
@@ -65,12 +78,10 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
             assertThat(it.raceTimeLimit, `is`(0L))
         }
 
-        sleep(TIME_SEND_INTERVAL - 1000)
         shouldReceiveType(ui, Type.TIME) {
             assertThat(it.time, equalTo(TIME_SEND_INTERVAL))
         }
 
-        sleep(TIME_SEND_INTERVAL - 1000)
         shouldReceiveType(ui, Type.TIME) {
             assertThat(it.time, equalTo(2 * TIME_SEND_INTERVAL))
         }
@@ -109,6 +120,36 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
             assertThat(it.time, greaterThanOrEqualTo(raceTimeLimit * 1000L))
             assertThat(it.time, `is`(raceTimeLimit * 1000L))
             assertThat(it.raceTimeLimit, `is`(raceTimeLimit))
+        }
+    }
+
+    @Test
+    fun testAutoFinishRaceByTimeLimitAfterStopAndContinue() {
+        val raceTimeLimit = 4L
+        sendTimeRequestCommand(raceTimeLimit)
+        val stopwatch = Stopwatch().start()
+        givenRunningState()
+
+        sleep(1000)
+        sendCommand(State.FINISH)
+        shouldReceiveState(ui, State.FINISH)
+        stopwatch.stop()
+
+        sleep(1000)
+        sendCommand(State.RUNNING)
+        stopwatch.`continue`()
+
+        shouldReceiveState(ui, State.FINISH)
+        stopwatch.stop()
+
+        Awaitility.await().untilAsserted {
+            shouldReceiveType(ui, Type.TIME) {
+                assertThat(it.raceTimeLimit, `is`(raceTimeLimit))
+                assertThat(it.time, greaterThanOrEqualTo(raceTimeLimit * 1000L))
+                assertThat(it.time, lessThanOrEqualTo(raceTimeLimit * 1000L + 100))
+                assertThat(stopwatch.time(), greaterThanOrEqualTo(raceTimeLimit * 1000L))
+                assertThat(stopwatch.time(), lessThanOrEqualTo(raceTimeLimit * 1000L + 100))
+            }
         }
     }
 

@@ -28,6 +28,7 @@ import org.roborace.lapscounter.domain.api.Message
 import org.roborace.lapscounter.domain.api.MessageResult
 import org.roborace.lapscounter.domain.api.ResponseType
 import org.springframework.test.util.ReflectionTestUtils
+import java.lang.Thread.sleep
 
 @ExtendWith(MockKExtension::class)
 internal class LapsCounterServiceTest {
@@ -111,6 +112,25 @@ internal class LapsCounterServiceTest {
         assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2)
         assertThatMessageHasState(messages[0], State.FINISH)
         assertThatMessageHasTime(messages[1])
+
+        verify { lapsCounterScheduler.resetSchedulers() }
+    }
+
+    @Test
+    fun testCommandFinishAndContinue() {
+        givenRaceState(State.RUNNING)
+        sleep(500)
+        justRun { lapsCounterScheduler.resetSchedulers() }
+        whenHandleMessage(aCommand(State.FINISH))
+        val time = messages[1].time!!
+        assertThat(time, greaterThanOrEqualTo(500))
+
+        whenHandleMessage(aCommand(State.RUNNING))
+
+        assertThatMessageResultHasTypeAndMessages(ResponseType.BROADCAST, 2)
+        assertThatMessageHasState(messages[0], State.RUNNING)
+        assertThatMessageHasTime(messages[1])
+        assertThat(time, greaterThanOrEqualTo(time))
 
         verify { lapsCounterScheduler.resetSchedulers() }
     }

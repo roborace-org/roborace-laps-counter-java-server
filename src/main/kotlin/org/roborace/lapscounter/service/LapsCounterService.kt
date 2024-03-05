@@ -3,6 +3,10 @@ package org.roborace.lapscounter.service
 import org.roborace.lapscounter.domain.LapsCounterException
 import org.roborace.lapscounter.domain.Robot
 import org.roborace.lapscounter.domain.State
+import org.roborace.lapscounter.domain.State.FINISH
+import org.roborace.lapscounter.domain.State.READY
+import org.roborace.lapscounter.domain.State.RUNNING
+import org.roborace.lapscounter.domain.State.STEADY
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
 import org.roborace.lapscounter.domain.api.MessageResult
@@ -28,7 +32,7 @@ class LapsCounterService(
     @Autowired
     private lateinit var lapsCounterScheduler: LapsCounterScheduler
 
-    private var state = State.READY
+    private var state = READY
     private var raceTimeLimit: Long = 0
     val stopwatch = Stopwatch()
     private val robots: MutableList<Robot> = mutableListOf()
@@ -65,7 +69,7 @@ class LapsCounterService(
         state = parsedState
         messageResult.add(getState())
         when (state) {
-            State.READY -> {
+            READY -> {
                 stopwatch.reset()
                 robots.forEach { it.reset() }
                 frameProcessor.reset()
@@ -73,17 +77,19 @@ class LapsCounterService(
                 messageResult.addAll(getLapMessages(robots))
             }
 
-            State.STEADY -> {
+            STEADY -> {
             }
 
-            State.RUNNING -> {
-                stopwatch.start()
+            RUNNING -> {
+                stopwatch.`continue`()
                 if (raceTimeLimit > 0) {
-                    lapsCounterScheduler.addSchedulerForFinishRace(TimeUnit.SECONDS.toMillis(raceTimeLimit))
+                    lapsCounterScheduler.addSchedulerForFinishRace(
+                        TimeUnit.SECONDS.toMillis(raceTimeLimit)
+                    )
                 }
             }
 
-            State.FINISH -> {
+            FINISH -> {
                 stopwatch.stop()
                 lapsCounterScheduler.resetSchedulers()
             }
@@ -94,8 +100,12 @@ class LapsCounterService(
     }
 
     private fun isCorrectCommand(newState: State) =
-        if (newState.ordinal == state.ordinal + 1) true
-        else newState.ordinal == 0 && state.ordinal == State.entries.size - 1
+        when (state) {
+            RUNNING -> newState == FINISH
+            READY -> newState == STEADY
+            STEADY -> newState == RUNNING
+            FINISH -> newState == RUNNING || newState == READY
+        }
 
     private fun robotInit(message: Message): MessageResult {
         val serial = message.serial ?: throw LapsCounterException("Robot serial is not defined")
@@ -138,13 +148,13 @@ class LapsCounterService(
     }
 
     private fun timeRequest(message: Message): MessageResult =
-        if (message.raceTimeLimit != null && state != State.RUNNING) {
+        if (message.raceTimeLimit != null && state != RUNNING) {
             raceTimeLimit = message.raceTimeLimit
             broadcast(timeMessage())
         } else single(timeMessage())
 
     private fun lapManual(message: Message): MessageResult {
-        if (state != State.RUNNING) {
+        if (state != RUNNING) {
             log.info("Lap manual ignored: state is not running")
             throw LapsCounterException("Lap manual ignored: state is not running")
         }
@@ -173,7 +183,7 @@ class LapsCounterService(
     }
 
     private fun pitStop(message: Message): MessageResult {
-        if (state != State.RUNNING) {
+        if (state != RUNNING) {
             log.debug("PitStop ignored: state is not running")
             throw LapsCounterException("PitStop ignored: state is not running")
         }
@@ -190,7 +200,7 @@ class LapsCounterService(
     }
 
     private fun frame(message: Message): MessageResult {
-        if (state != State.RUNNING) {
+        if (state != RUNNING) {
             log.debug("Frame ignored: state is not running")
             return MessageResult(ResponseType.SINGLE)
         }

@@ -28,9 +28,10 @@ class LapsCounterScheduler(
             }
     }
 
-    fun addSchedulerForFinishRace(delayMs: Long) {
-        addScheduler(delayMs) {
-            while (lapsCounterService.stopwatch.time() < delayMs) Thread.yield()
+    fun addSchedulerForFinishRace(targetMs: Long) {
+        log.info("Scheduling finish in $targetMs ms")
+        addScheduler(targetMs - lapsCounterService.stopwatch.time()) {
+            while (lapsCounterService.stopwatch.time() < targetMs) Thread.yield()
             lapsCounterService.handleMessage(FINISH_MESSAGE).also {
                 webSocketHandler.broadcast(it.messages)
             }

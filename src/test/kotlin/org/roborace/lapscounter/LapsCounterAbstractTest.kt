@@ -86,8 +86,10 @@ internal abstract class LapsCounterAbstractTest {
         type: Type,
         assert: (it: Message) -> Unit = {}
     ) {
-        Awaitility.await().until { client.hasMessageWithType(type) }
-        assert(client.lastMessage)
+        Awaitility.await().untilAsserted {
+            client.hasMessageWithType(type)
+            assert(client.lastMessage)
+        }
     }
 
     companion object {
