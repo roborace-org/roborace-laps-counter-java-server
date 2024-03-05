@@ -91,6 +91,10 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
             assertThat(it.time, greaterThanOrEqualTo(2 * TIME_SEND_INTERVAL))
             assertThat(it.time, lessThan(2 * TIME_SEND_INTERVAL + 20))
         }
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, greaterThanOrEqualTo(2 * TIME_SEND_INTERVAL))
+            assertThat(it.time, lessThan(2 * TIME_SEND_INTERVAL + 20))
+        }
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.roborace.lapscounter.config
 
+import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.service.LapsCounterService
 import org.roborace.lapscounter.service.RoboraceWebSocketHandler
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,13 +31,13 @@ class DynamicSchedulingConfig : SchedulingConfigurer {
         taskRegistrar.setScheduler(taskExecutor())
         taskRegistrar.addTriggerTask(
             {
-                if (lapsCounterService.stopwatch.time() >= 0) {
+                if (lapsCounterService.getState().state == State.RUNNING) {
                     while (lapsCounterService.stopwatch.time() % timeSendInterval != 0L) {
                         yield()
                     }
-                    lapsCounterService.scheduled()?.let {
-                        webSocketHandler.broadcast(it)
-                    }
+                }
+                lapsCounterService.scheduled().let {
+                    webSocketHandler.broadcast(it)
                 }
             },
             {

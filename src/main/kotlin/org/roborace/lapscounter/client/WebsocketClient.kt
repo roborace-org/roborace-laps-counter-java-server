@@ -75,6 +75,7 @@ class WebsocketClient(endpointURI: URI, val name: String) {
     fun hasNoMessages(): Boolean = messages.isEmpty()
 
     fun hasMessageWithType(type: Type): Boolean {
+        lastMessage = Message(type = Type.ERROR)
         while (messages.isNotEmpty()) {
             lastMessage = messages.poll()
             if (lastMessage.type == Type.STATE) {
