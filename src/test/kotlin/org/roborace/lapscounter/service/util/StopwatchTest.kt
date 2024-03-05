@@ -16,7 +16,7 @@ internal class StopwatchTest {
             .sleep(DELAY)
             .assertTimeEqualSmooth(DELAY)
 
-        stopwatch.finish()
+        stopwatch.stop()
             .assertTimeEqualSmooth(DELAY)
     }
 
@@ -25,7 +25,7 @@ internal class StopwatchTest {
         val stopwatch = Stopwatch()
             .start()
             .sleep(DELAY)
-            .finish()
+            .stop()
             .assertTimeEqualSmooth(DELAY)
 
         stopwatch.sleep(DELAY)
@@ -36,7 +36,7 @@ internal class StopwatchTest {
     fun testStartAfterFinish() {
         val stopwatch = Stopwatch().start()
             .sleep(DELAY)
-            .finish()
+            .stop()
             .assertTimeEqualSmooth(DELAY)
 
         stopwatch.start()
@@ -50,7 +50,7 @@ internal class StopwatchTest {
         val stopwatch = Stopwatch().start()
             .sleep(DELAY)
             .assertTimeEqualSmooth(DELAY)
-            .finish()
+            .stop()
             .assertTimeEqualSmooth(DELAY)
 
         stopwatch.reset()
@@ -62,7 +62,7 @@ internal class StopwatchTest {
     fun testPauseContinue() {
         val stopwatch = Stopwatch().start()
             .sleep(DELAY)
-            .finish()
+            .stop()
             .sleep(DELAY)
 
         stopwatch.`continue`()
@@ -75,12 +75,12 @@ internal class StopwatchTest {
     fun testPauseContinueFinish() {
         val stopwatch = Stopwatch().start()
             .sleep(DELAY)
-            .finish()
+            .stop()
             .sleep(DELAY)
             .`continue`()
             .sleep(DELAY)
 
-        stopwatch.finish()
+        stopwatch.stop()
             .assertTimeEqualSmooth(2 * DELAY)
             .sleep(DELAY)
             .assertTimeEqualSmooth(2 * DELAY)

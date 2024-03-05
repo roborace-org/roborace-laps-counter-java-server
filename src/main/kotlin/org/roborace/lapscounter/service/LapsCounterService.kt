@@ -84,7 +84,7 @@ class LapsCounterService(
             }
 
             State.FINISH -> {
-                stopwatch.finish()
+                stopwatch.stop()
                 lapsCounterScheduler.resetSchedulers()
             }
         }

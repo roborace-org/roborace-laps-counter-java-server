@@ -18,7 +18,7 @@ class Stopwatch {
         return this
     }
 
-    fun finish(): Stopwatch {
+    fun stop(): Stopwatch {
         endTime = millis()
         return this
     }
