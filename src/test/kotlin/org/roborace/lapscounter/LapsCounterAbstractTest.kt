@@ -76,13 +76,18 @@ internal abstract class LapsCounterAbstractTest {
         client.sendMessage(objectMapper.writeValueAsString(message))
 
     protected fun shouldReceiveState(client: WebsocketClient, state: State) {
-        shouldReceiveType(client, Type.STATE)
-        assertThat(client.lastMessage.state, equalTo(state))
+        shouldReceiveType(client, Type.STATE) {
+            assertThat(it.state, equalTo(state))
+        }
     }
 
-    protected fun shouldReceiveType(client: WebsocketClient, type: Type): Message {
+    protected fun shouldReceiveType(
+        client: WebsocketClient,
+        type: Type,
+        assert: (it: Message) -> Unit = {}
+    ) {
         Awaitility.await().until { client.hasMessageWithType(type) }
-        return client.lastMessage
+        assert(client.lastMessage)
     }
 
     companion object {

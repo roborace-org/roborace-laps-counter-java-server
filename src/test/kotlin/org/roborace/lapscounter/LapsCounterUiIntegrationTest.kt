@@ -3,7 +3,10 @@ package org.roborace.lapscounter
 import org.awaitility.Awaitility
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.greaterThanOrEqualTo
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.lessThan
 import org.junit.jupiter.api.Test
 import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.domain.Type
@@ -57,35 +60,41 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
 
         sendCommandAndCheckState(State.RUNNING)
 
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, lessThan(100L))
-        assertThat(ui.lastMessage.raceTimeLimit, `is`(0L))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, lessThan(100L))
+            assertThat(it.raceTimeLimit, `is`(0L))
+        }
 
         sleep(TIME_SEND_INTERVAL - 1000)
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, equalTo(TIME_SEND_INTERVAL))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, equalTo(TIME_SEND_INTERVAL))
+        }
 
         sleep(TIME_SEND_INTERVAL - 1000)
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, equalTo(2 * TIME_SEND_INTERVAL))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, equalTo(2 * TIME_SEND_INTERVAL))
+        }
 
         sendCommandAndCheckState(State.FINISH)
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, greaterThanOrEqualTo(2 * TIME_SEND_INTERVAL))
-        assertThat(ui.lastMessage.time, lessThan(2 * TIME_SEND_INTERVAL + 20))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, greaterThanOrEqualTo(2 * TIME_SEND_INTERVAL))
+            assertThat(it.time, lessThan(2 * TIME_SEND_INTERVAL + 20))
+        }
     }
 
     @Test
     fun testSendRaceTimeLimit() {
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, `is`(0L))
-        assertThat(ui.lastMessage.raceTimeLimit, `is`(0L))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, `is`(0L))
+            assertThat(it.raceTimeLimit, `is`(0L))
+        }
 
         sendTimeRequestCommand(3600L)
 
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, `is`(0L))
-        assertThat(ui.lastMessage.raceTimeLimit, `is`(3600L))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, `is`(0L))
+            assertThat(it.raceTimeLimit, `is`(3600L))
+        }
     }
 
     @Test
@@ -96,10 +105,11 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
 
         shouldReceiveState(ui, State.FINISH)
 
-        shouldReceiveType(ui, Type.TIME)
-        assertThat(ui.lastMessage.time, greaterThanOrEqualTo(raceTimeLimit * 1000L))
-        assertThat(ui.lastMessage.time, `is`(raceTimeLimit * 1000L))
-        assertThat(ui.lastMessage.raceTimeLimit, `is`(raceTimeLimit))
+        shouldReceiveType(ui, Type.TIME) {
+            assertThat(it.time, greaterThanOrEqualTo(raceTimeLimit * 1000L))
+            assertThat(it.time, `is`(raceTimeLimit * 1000L))
+            assertThat(it.raceTimeLimit, `is`(raceTimeLimit))
+        }
     }
 
     @Test
@@ -149,11 +159,10 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
         val serials = mutableSetOf(FIRST_SERIAL, SECOND_SERIAL)
         sendMessage(ui, Message(Type.LAPS))
         Awaitility.await().until {
-            shouldReceiveType(ui, Type.LAP)
-            println("serials = $serials")
-            println("ui.getLastMessage().serial = ${ui.lastMessage.serial}")
-            assertThat(serials, Matchers.hasItem(ui.lastMessage.serial))
-            serials.remove(ui.lastMessage.serial)
+            shouldReceiveType(ui, Type.LAP) {
+                assertThat(serials, Matchers.hasItem(it.serial))
+                serials.remove(it.serial)
+            }
             serials.isEmpty()
         }
     }

@@ -51,57 +51,65 @@ internal class LapsCounterRobotIntegrationTest : LapsCounterAbstractTest() {
     fun testRobotInit() {
         sendMessage(robot1, Message(Type.ROBOT_INIT, serial = FIRST_SERIAL))
 
-        shouldReceiveType(robot1, Type.LAP)
-        assertThat(robot1.lastMessage.serial, equalTo(FIRST_SERIAL))
+        shouldReceiveType(robot1, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+        }
 
-        shouldReceiveType(ui, Type.LAP)
-        assertThat(ui.lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(ui.lastMessage.name, equalTo("Robot $FIRST_SERIAL"))
+        shouldReceiveType(ui, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.name, equalTo("Robot $FIRST_SERIAL"))
+        }
     }
 
     @Test
     fun testRobotInitWithName() {
         sendMessage(robot1, Message(Type.ROBOT_INIT, serial = FIRST_SERIAL, name = "MyCool Name"))
 
-        shouldReceiveType(robot1, Type.LAP)
-        assertThat(robot1.lastMessage.serial, equalTo(FIRST_SERIAL))
+        shouldReceiveType(robot1, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+        }
 
-        shouldReceiveType(ui, Type.LAP)
-        assertThat(ui.lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(ui.lastMessage.name, equalTo("MyCool Name"))
+        shouldReceiveType(ui, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.name, equalTo("MyCool Name"))
+        }
     }
 
     @Test
     fun testRobotEdit() {
         sendMessage(robot1, Message(Type.ROBOT_INIT, serial = FIRST_SERIAL))
 
-        shouldReceiveType(robot1, Type.LAP)
-        assertThat(robot1.lastMessage.serial, equalTo(FIRST_SERIAL))
+        shouldReceiveType(robot1, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+        }
 
-        shouldReceiveType(ui, Type.LAP)
-        assertThat(ui.lastMessage.serial, equalTo(FIRST_SERIAL))
+        shouldReceiveType(ui, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+        }
 
         val newName = "WINNER ${Random.nextInt(10) + 200}"
         sendMessage(ui, Message(Type.ROBOT_EDIT, serial = FIRST_SERIAL, name = newName))
 
-        shouldReceiveType(ui, Type.LAP)
-        assertThat(ui.lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(ui.lastMessage.name, equalTo(newName))
+        shouldReceiveType(ui, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.name, equalTo(newName))
+        }
 
 
         sendMessage(ui, Message(Type.LAPS))
-        shouldReceiveType(ui, Type.LAP)
-        assertThat(ui.lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(ui.lastMessage.name, equalTo(newName))
+        shouldReceiveType(ui, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.name, equalTo(newName))
+        }
     }
 
     @Test
     fun testMaxRobots() {
         val robots = (1..MAX_ROBOTS)
             .map {
-                Thread.sleep(10)
-                createClient("ROBOT${it + 1}").also {
-                    shouldReceiveState(it, State.READY)
+                sleep(10)
+                createClient("ROBOT${it + 1}").also { client ->
+                    shouldReceiveState(client, State.READY)
                 }
             }
 
@@ -126,7 +134,9 @@ internal class LapsCounterRobotIntegrationTest : LapsCounterAbstractTest() {
 
     private fun shouldReceiveLap(robots: List<WebsocketClient>) {
         shouldReceiveType(ui, Type.LAP)
-        robots.forEach { shouldReceiveType(it, Type.LAP) }
+        robots.forEach {
+            shouldReceiveType(it, Type.LAP)
+        }
     }
 
 

@@ -2,7 +2,10 @@ package org.roborace.lapscounter
 
 import org.awaitility.Awaitility
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.greaterThanOrEqualTo
+import org.hamcrest.Matchers.lessThan
+import org.hamcrest.Matchers.lessThanOrEqualTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -77,9 +80,10 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         sendAllFrames()
 
         Awaitility.await().untilAsserted {
-            val lastMessage = shouldReceiveType(robot1, Type.LAP)
-            assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-            assertThat(lastMessage.laps, equalTo(1))
+            shouldReceiveType(robot1, Type.LAP) {
+                assertThat(it.serial, equalTo(FIRST_SERIAL))
+                assertThat(it.laps, equalTo(1))
+            }
         }
 
         shouldReceiveType(ui, Type.LAP)
@@ -92,9 +96,10 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         sendAllFramesWrongRotation()
 
         Awaitility.await().untilAsserted {
-            val lastMessage = shouldReceiveType(robot1, Type.LAP)
-            assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-            assertThat(lastMessage.laps, equalTo(-1))
+            shouldReceiveType(robot1, Type.LAP) {
+                assertThat(it.serial, equalTo(FIRST_SERIAL))
+                assertThat(it.laps, equalTo(-1))
+            }
         }
 
         shouldReceiveType(ui, Type.LAP)
@@ -112,20 +117,22 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         stopwatch.finish()
         val stopwatch2 = Stopwatch().start()
         Awaitility.await().untilAsserted {
-            val lastMessage = shouldReceiveType(robot1, Type.LAP)
-            assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-            assertThat(lastMessage.laps, equalTo(1))
-            assertTimeEquals(lastMessage.lastLapTime, stopwatch.time())
+            shouldReceiveType(robot1, Type.LAP) {
+                assertThat(it.serial, equalTo(FIRST_SERIAL))
+                assertThat(it.laps, equalTo(1))
+                assertTimeEquals(it.lastLapTime, stopwatch.time())
+            }
         }
 
 
         sleep(2 * safeInterval)
         sendAllFrames()
         stopwatch2.finish()
-        val lastMessage = shouldReceiveType(robot1, Type.LAP)
-        assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-        assertThat(lastMessage.laps, equalTo(2))
-        assertTimeEquals(lastMessage.lastLapTime, stopwatch2.time())
+        shouldReceiveType(robot1, Type.LAP) {
+            assertThat(it.serial, equalTo(FIRST_SERIAL))
+            assertThat(it.laps, equalTo(2))
+            assertTimeEquals(it.lastLapTime, stopwatch2.time())
+        }
     }
 
     @Test
@@ -139,7 +146,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         stopwatch.finish()
         val stopwatch2 = Stopwatch().start()
         Awaitility.await().untilAsserted {
-            shouldReceiveType(robot1, Type.LAP).also {
+            shouldReceiveType(robot1, Type.LAP) {
                 assertThat(it.serial, equalTo(FIRST_SERIAL))
                 assertThat(it.laps, equalTo(1))
                 assertThat(it.lastLapTime, equalTo(it.bestLapTime))
@@ -152,7 +159,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         sendAllFrames()
         stopwatch2.finish()
         val stopwatch3 = Stopwatch().start()
-        shouldReceiveType(robot1, Type.LAP).also {
+        shouldReceiveType(robot1, Type.LAP) {
             assertThat(it.serial, equalTo(FIRST_SERIAL))
             assertThat(it.laps, equalTo(2))
             assertTimeEquals(it.lastLapTime, stopwatch2.time())
@@ -163,7 +170,7 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
         sleep(safeInterval)
         sendAllFrames()
         stopwatch3.finish()
-        shouldReceiveType(robot1, Type.LAP).also {
+        shouldReceiveType(robot1, Type.LAP) {
             assertThat(it.serial, equalTo(FIRST_SERIAL))
             assertThat(it.laps, equalTo(3))
             assertTimeEquals(it.lastLapTime, stopwatch3.time())
@@ -187,10 +194,10 @@ internal class LapsCounterFrameIntegrationTest : LapsCounterAbstractTest() {
             sendAllFrames()
 
             Awaitility.await().untilAsserted {
-                val lastMessage = shouldReceiveType(robot1, Type.LAP)
-                println("lastMessage = $lastMessage")
-                assertThat(lastMessage.serial, equalTo(FIRST_SERIAL))
-                assertThat(lastMessage.laps, equalTo(laps))
+                shouldReceiveType(robot1, Type.LAP) {
+                    assertThat(it.serial, equalTo(FIRST_SERIAL))
+                    assertThat(it.laps, equalTo(laps))
+                }
             }
         }
     }
