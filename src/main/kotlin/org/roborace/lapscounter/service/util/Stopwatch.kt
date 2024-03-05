@@ -12,16 +12,26 @@ class Stopwatch {
         return this
     }
 
-    fun finish() {
-        endTime = millis()
+    fun `continue`(): Stopwatch {
+        startTime = millis() - time()
+        endTime = 0
+        return this
     }
 
-    fun reset() {
+    fun finish(): Stopwatch {
+        endTime = millis()
+        return this
+    }
+
+    fun reset(): Stopwatch {
         startTime = 0
         endTime = 0
+        return this
     }
 
     fun isRunning() = startTime != 0L && endTime == 0L
 
-    private fun millis() = System.currentTimeMillis()
+    companion object {
+        private fun millis() = System.currentTimeMillis()
+    }
 }

@@ -2,6 +2,7 @@ package org.roborace.lapscounter.service.util
 
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.hamcrest.Matchers.lessThanOrEqualTo
 import org.junit.jupiter.api.Test
 
@@ -9,46 +10,98 @@ internal class StopwatchTest {
     @Test
     fun testHappyPath() {
         val stopwatch = Stopwatch()
-        assertThat(stopwatch.time(), `is`(0L))
+            .assertTimeEqual(0L)
 
         stopwatch.start()
-        Thread.sleep(DELAY)
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
+            .sleep(DELAY)
+            .assertTimeEqualSmooth(DELAY)
 
         stopwatch.finish()
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 20))
+            .assertTimeEqualSmooth(DELAY)
+    }
+
+    @Test
+    fun testTimeStillSameAfterFinish() {
+        val stopwatch = Stopwatch()
+            .start()
+            .sleep(DELAY)
+            .finish()
+            .assertTimeEqualSmooth(DELAY)
+
+        stopwatch.sleep(DELAY)
+            .assertTimeEqualSmooth(DELAY)
     }
 
     @Test
     fun testStartAfterFinish() {
         val stopwatch = Stopwatch().start()
-        Thread.sleep(DELAY)
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
-
-        stopwatch.finish()
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
+            .sleep(DELAY)
+            .finish()
+            .assertTimeEqualSmooth(DELAY)
 
         stopwatch.start()
-        assertThat(stopwatch.time(), `is`(0L))
-        Thread.sleep(DELAY)
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
+            .assertTimeEqual(0L)
+            .sleep(DELAY)
+            .assertTimeEqualSmooth(DELAY)
     }
 
     @Test
     fun testReset() {
         val stopwatch = Stopwatch().start()
-        Thread.sleep(DELAY)
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
-
-        stopwatch.finish()
-        assertThat(stopwatch.time(), lessThanOrEqualTo(DELAY + 10))
+            .sleep(DELAY)
+            .assertTimeEqualSmooth(DELAY)
+            .finish()
+            .assertTimeEqualSmooth(DELAY)
 
         stopwatch.reset()
-        Thread.sleep(DELAY)
-        assertThat(stopwatch.time(), `is`(0L))
+            .sleep(DELAY)
+            .assertTimeEqual(0L)
+    }
+
+    @Test
+    fun testPauseContinue() {
+        val stopwatch = Stopwatch().start()
+            .sleep(DELAY)
+            .finish()
+            .sleep(DELAY)
+
+        stopwatch.`continue`()
+            .assertTimeEqualSmooth(DELAY)
+            .sleep(DELAY)
+            .assertTimeEqualSmooth(2 * DELAY)
+    }
+
+    @Test
+    fun testPauseContinueFinish() {
+        val stopwatch = Stopwatch().start()
+            .sleep(DELAY)
+            .finish()
+            .sleep(DELAY)
+            .`continue`()
+            .sleep(DELAY)
+
+        stopwatch.finish()
+            .assertTimeEqualSmooth(2 * DELAY)
+            .sleep(DELAY)
+            .assertTimeEqualSmooth(2 * DELAY)
     }
 
     companion object {
         private const val DELAY = 125L
     }
+}
+
+private fun Stopwatch.sleep(delay: Long): Stopwatch {
+    Thread.sleep(delay)
+    return this
+}
+
+private fun Stopwatch.assertTimeEqual(ms: Long) = this.apply {
+    assertThat(this.time(), `is`(ms))
+}
+
+private fun Stopwatch.assertTimeEqualSmooth(ms: Long) = this.apply {
+    val time = this.time()
+    assertThat(time, lessThanOrEqualTo(ms + 15))
+    assertThat(time, greaterThanOrEqualTo(ms))
 }
