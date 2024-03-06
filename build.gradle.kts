@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
+    id("net.researchgate.release") version "3.0.2"
 }
 
 repositories {
@@ -41,6 +42,8 @@ version = "1.0.2-SNAPSHOT"
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
 }
+
+release.git.requireBranch = "master"
 
 tasks.test {
     maxParallelForks = 2
