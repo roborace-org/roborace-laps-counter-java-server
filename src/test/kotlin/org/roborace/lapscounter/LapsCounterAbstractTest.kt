@@ -97,7 +97,7 @@ internal abstract class LapsCounterAbstractTest {
         const val SECOND_SERIAL: Int = 101
 
         private fun wsServer(port: Int) = "ws://localhost:$port/ws"
-        const val TIME_SEND_INTERVAL: Long = 3000L
+        const val TIME_SEND_INTERVAL: Long = 800L
 
         @JvmStatic
         @BeforeAll

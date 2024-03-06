@@ -21,7 +21,7 @@ import java.lang.Thread.sleep
 
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
-    properties = ["laps.pit-stop-time=1230", "laps.time-send-interval:3000"])
+    properties = ["laps.pit-stop-time=1230", "laps.time-send-interval:800"])
 internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
 
     @Test
@@ -129,17 +129,17 @@ internal class LapsCounterUiIntegrationTest : LapsCounterAbstractTest() {
 
     @Test
     fun testAutoFinishRaceByTimeLimitAfterStopAndContinue() {
-        val raceTimeLimit = 4L
+        val raceTimeLimit = 2L
         sendTimeRequestCommand(raceTimeLimit)
         val stopwatch = Stopwatch().start()
         givenRunningState()
 
-        sleep(1000)
+        sleep(500)
         sendCommand(State.FINISH)
         shouldReceiveState(ui, State.FINISH)
         stopwatch.stop()
 
-        sleep(1000)
+        sleep(500)
         sendCommand(State.RUNNING)
         stopwatch.`continue`()
 
