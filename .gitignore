@@ -1,2 +1,5 @@
 target
 src/main/resources/public
+gradlew*
+.gradle
+gradle

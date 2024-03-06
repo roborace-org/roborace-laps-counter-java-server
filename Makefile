@@ -1,54 +1,25 @@
 
-USER_ID ?= $(shell stat -c "%u:%g" .)
-
 clean:
-	mvn -B clean
+	./gradlew clean
 build:
-	mvn -B package
+	./gradlew build
 build-no-tests:
-	mvn -B package -DskipTests=true
-unit-tests:
-	mvn -B test
-integration-tests:
-	mvn -B failsafe:integration-test
-qa:
-	mvn -B pmd:check -Dpmd.printFailingErrors=true
+	./gradlew build -x test
+jar:
+	./gradlew jar
+tests:
+	./gradlew test
 run:
-	mvn spring-boot:run
-run-jar: build-no-tests
-	java -jar target/*.jar
-
+	./gradlew bootRun
 release:
-	mvn -B release:prepare release:perform -Darguments="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true"
+	./gradlew release
 
+SERVER ?= valery@laps.roborace.org
+scp-jar: jar
+	scp build/libs/roborace-laps-counter.jar ${SERVER}:/app/roborace-laps-counter/
 
-PROJECT = roborace-laps-counter
-USER    = pi
-service-install:
-	mkdir -p /app/${PROJECT}
-	chown ${USER}:${USER} /app/${PROJECT}
-	touch /var/log/${PROJECT}.log
-	chown ${USER}:${USER} /var/log/${PROJECT}.log
-	cp install/${PROJECT} /etc/init.d/${PROJECT}
-	chmod +x /etc/init.d/${PROJECT}
-	update-rc.d ${PROJECT} defaults
+remote-restart: scp-jar
+	ssh ${SERVER} sudo service roborace restart
 
-service-start:
-	sudo service ${PROJECT} start
-
-service-stop:
-	sudo service ${PROJECT} stop
-
-service-logs:
-	service ${PROJECT} logs
-
-target/roborace-laps-counter.jar:
-	make build-no-tests
-
-service-update-jar: target/roborace-laps-counter.jar
-	cp target/roborace-laps-counter.jar /app/${PROJECT}/
-
-SERVER ?= pi@192.168.1.200
-scp-jar:
-	scp target/roborace-laps-counter.jar ${SERVER}:/app/roborace-laps-counter/
-
+remote-restart-jr:
+	ssh ${SERVER} sudo service jr-roborace restart
