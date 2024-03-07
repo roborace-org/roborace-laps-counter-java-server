@@ -16,19 +16,7 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                sh 'make unit-tests'
-            }
-        }
-
-        stage('Integration Tests') {
-            steps {
-                sh 'make integration-tests'
-            }
-        }
-
-        stage('qa') {
-            steps {
-                sh 'make qa'
+                sh 'make tests'
             }
         }
 
