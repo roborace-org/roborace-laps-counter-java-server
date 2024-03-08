@@ -37,7 +37,6 @@ configurations {
 
 group = "org.roborace"
 description = "roborace-laps-counter"
-version = "1.0.2-SNAPSHOT"
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
