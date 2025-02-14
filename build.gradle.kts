@@ -1,9 +1,10 @@
 plugins {
-    id("org.springframework.boot") version "3.2.3"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    id("net.researchgate.release") version "3.0.2"
+    id("org.springframework.boot") version "3.4.2"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "2.1.10"
+    kotlin("plugin.spring") version "2.1.10"
+    id("net.researchgate.release") version "3.1.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
 }
 
 repositories {
@@ -23,10 +24,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("javax.websocket:javax.websocket-client-api:1.1")
-    testImplementation("org.glassfish.tyrus:tyrus-client:1.17")
+    testImplementation("org.glassfish.tyrus:tyrus-client:2.2.0")
     testImplementation("org.glassfish.tyrus:tyrus-container-grizzly:1.2.1")
-    testImplementation("org.awaitility:awaitility:4.2.0")
-    testImplementation("io.mockk:mockk-jvm:1.13.9")
+    testImplementation("org.awaitility:awaitility:4.2.2")
+    testImplementation("io.mockk:mockk-jvm:1.13.16")
 }
 
 configurations {
@@ -45,6 +46,6 @@ tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar
 release.git.requireBranch = "master"
 
 tasks.test {
-    maxParallelForks = 2
+    maxParallelForks = 1
     useJUnitPlatform()
 }
