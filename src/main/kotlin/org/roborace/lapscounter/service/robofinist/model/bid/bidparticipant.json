@@ -1,0 +1,116 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "id": 145093,
+      "email": "tatyana-satyrova@yandex.ru",
+      "first_name": "Виктория",
+      "last_name": "Шукало",
+      "middle_name": "Дмитриевна",
+      "is_confirmed_event": 1,
+      "is_confirmed": 1,
+      "mentor": 0,
+      "displayId": "PAR-145093",
+      "organization": {
+        "id": 42389,
+        "displayId": "ORG-42389",
+        "name": "Клуб робототехники \"Аксиома\""
+      },
+      "user": {
+        "id": 46711,
+        "email": "tatyana-satyrova@yandex.ru",
+        "first_name": "Виктория",
+        "last_name": "Шукало",
+        "middle_name": "Дмитриевна",
+        "phone": "+375 29 735-55-05",
+        "birthday": "2012-04-12",
+        "gender": 2,
+        "tshirt_size": "XS",
+        "address": null,
+        "city": "обл. Гомельская, г. Гомель",
+        "phone_home": null,
+        "displayId": "USR-46711",
+        "snils": null,
+        "is_adult": false,
+        "organizations": {
+          "42389": "Клуб робототехники \"Аксиома\""
+        }
+      }
+    },
+    {
+      "id": 145094,
+      "email": "popkorn231@gmail.com",
+      "first_name": "Никита",
+      "last_name": "Ващенко",
+      "middle_name": "Андреевич",
+      "is_confirmed_event": 1,
+      "is_confirmed": 1,
+      "mentor": 1,
+      "displayId": "PAR-145094",
+      "organization": {
+        "id": 44231,
+        "displayId": "ORG-44231",
+        "name": "ГУО \"Гимназия № 51 г. Гомеля\""
+      },
+      "user": {
+        "id": 35960,
+        "email": "popkorn231@gmail.com",
+        "first_name": "Никита",
+        "last_name": "Ващенко",
+        "middle_name": "Андреевич",
+        "phone": "+375 44 570-33-13",
+        "birthday": "1997-01-31",
+        "gender": 1,
+        "tshirt_size": "M",
+        "address": null,
+        "city": "обл. Гомельская, г. Гомель",
+        "phone_home": null,
+        "displayId": "USR-35960",
+        "snils": null,
+        "is_adult": true,
+        "organizations": {
+          "44231": "ГУО \"Гимназия № 51 г. Гомеля\"",
+          "42389": "Клуб робототехники \"Аксиома\"",
+          "43948": "Клуб робототехники, электроники и программирования VECTOR"
+        }
+      }
+    },
+    {
+      "id": 145095,
+      "email": "nnt@tut.by",
+      "first_name": "Наталья",
+      "last_name": "Томашенко",
+      "middle_name": "Николаевна",
+      "is_confirmed_event": 1,
+      "is_confirmed": 1,
+      "mentor": 1,
+      "displayId": "PAR-145095",
+      "organization": {
+        "id": 42389,
+        "displayId": "ORG-42389",
+        "name": "Клуб робототехники \"Аксиома\""
+      },
+      "user": {
+        "id": 24095,
+        "email": "nnt@tut.by",
+        "first_name": "Наталья",
+        "last_name": "Томашенко",
+        "middle_name": "Николаевна",
+        "phone": "+375 29 610-11-32",
+        "birthday": "1977-09-01",
+        "gender": 2,
+        "tshirt_size": "L",
+        "address": "test",
+        "city": "обл. Гомельская, г. Гомель",
+        "phone_home": null,
+        "displayId": "USR-24095",
+        "snils": null,
+        "is_adult": true,
+        "organizations": {
+          "42389": "Клуб робототехники \"Аксиома\""
+        }
+      }
+    }
+  ]
+}

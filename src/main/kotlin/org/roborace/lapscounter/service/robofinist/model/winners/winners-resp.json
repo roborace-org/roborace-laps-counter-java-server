@@ -1,0 +1,201 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "display_id": "31260",
+      "place": 1,
+      "bid_id": 109790,
+      "bid": {
+        "display_id": "BID-109790",
+        "id": 109790,
+        "name": "IT Schumacher",
+        "organizations": [
+          {
+            "display_id": "ORG-42582",
+            "name": "ООО \"АйТи Скул\""
+          }
+        ],
+        "robots": [
+          {
+            "display_id": "ROB-75493",
+            "id": 75493,
+            "name": "Schumacher"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-129640",
+            "id": 129640,
+            "fullName": "Охримчук Валерий Валерьевич"
+          }
+        ]
+      }
+    },
+    {
+      "display_id": "31261",
+      "place": 5,
+      "bid_id": 113379,
+      "bid": {
+        "display_id": "BID-113379",
+        "id": 113379,
+        "name": "Радабокс-рейс",
+        "organizations": [],
+        "robots": [
+          {
+            "display_id": "ROB-75916",
+            "id": 75916,
+            "name": "Радабокс-рейс"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-127754",
+            "id": 127754,
+            "fullName": "Огневой Владимир Дмитриевич"
+          }
+        ]
+      }
+    },
+    {
+      "display_id": "31262",
+      "place": 6,
+      "bid_id": 113852,
+      "bid": {
+        "display_id": "BID-113852",
+        "id": 113852,
+        "name": "Радабокс Рейс Мини",
+        "organizations": [
+          {
+            "display_id": "ORG-42984",
+            "name": "CyberLab"
+          }
+        ],
+        "robots": [
+          {
+            "display_id": "ROB-76282",
+            "id": 76282,
+            "name": "Радабокс Рейс Мини"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-125309",
+            "id": 125309,
+            "fullName": "Огневая Татьяна Анатольевна"
+          },
+          {
+            "display_id": "PAR-126156",
+            "id": 126156,
+            "fullName": "Огневой Антон Владимирович"
+          },
+          {
+            "display_id": "PAR-127754",
+            "id": 127754,
+            "fullName": "Огневой Владимир Дмитриевич"
+          }
+        ]
+      }
+    },
+    {
+      "display_id": "31263",
+      "place": 3,
+      "bid_id": 114020,
+      "bid": {
+        "display_id": "BID-114020",
+        "id": 114020,
+        "name": "MVR-13 Pro",
+        "organizations": [
+          {
+            "display_id": "ORG-42579",
+            "name": "STEM-класс RoboClever"
+          }
+        ],
+        "robots": [
+          {
+            "display_id": "ROB-76391",
+            "id": 76391,
+            "name": "MVR-13 Pro"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-125322",
+            "id": 125322,
+            "fullName": "Михалюк Матвей Евгеньевич"
+          },
+          {
+            "display_id": "PAR-125324",
+            "id": 125324,
+            "fullName": "Марченко Кирилл Васильевич"
+          },
+          {
+            "display_id": "PAR-125325",
+            "id": 125325,
+            "fullName": "Войтович Павел Леонидович"
+          }
+        ]
+      }
+    },
+    {
+      "display_id": "31264",
+      "place": 4,
+      "bid_id": 114024,
+      "bid": {
+        "display_id": "BID-114024",
+        "id": 114024,
+        "name": "MGRobot-mini",
+        "organizations": [
+          {
+            "display_id": "ORG-42704",
+            "name": "ГУО \"Гимназия г. Мяделя\""
+          }
+        ],
+        "robots": [
+          {
+            "display_id": "ROB-76408",
+            "id": 76408,
+            "name": "MGRobot-mini"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-135415",
+            "id": 135415,
+            "fullName": "Савчик Вячеслав Станиславович"
+          }
+        ]
+      }
+    },
+    {
+      "display_id": "31265",
+      "place": 2,
+      "bid_id": 114238,
+      "bid": {
+        "display_id": "BID-114238",
+        "id": 114238,
+        "name": "РобоЧерни Про",
+        "organizations": [
+          {
+            "display_id": "ORG-42735",
+            "name": "ГУО \"Средняя школа д.Черни\""
+          }
+        ],
+        "robots": [
+          {
+            "display_id": "ROB-76581",
+            "id": 76581,
+            "name": "РобоЧерни Про"
+          }
+        ],
+        "participants": [
+          {
+            "display_id": "PAR-134974",
+            "id": 134974,
+            "fullName": "Постоялко Александр Викторович"
+          }
+        ]
+      }
+    }
+  ]
+}

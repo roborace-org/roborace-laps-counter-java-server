@@ -1,0 +1,188 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "display_id": "EPR-6576",
+      "id": 6576,
+      "event_id": 1025,
+      "name": "Roborace. PRO Mini",
+      "description": "<p>Соревнования Roborace во многом похожи на соревнования Формулы 1, но с тем отличием, что соревнуются не управляемые пилотами болиды, а полностью автономные роботы. Роботы полагаются на показания своих датчиков, чтобы ориентироваться по трассе (ограниченной бортами), маневрировать, выбирать скорость движения и избегать столкновений с соперниками.<\/p>",
+      "regulations_id": 2397,
+      "is_tournament": 1,
+      "check_unique_participant": 0,
+      "max_robot": 1,
+      "min_participant": 1,
+      "max_participant": 2,
+      "arRequiredRobotsFields": [
+        "file_image_id",
+        "content"
+      ],
+      "sort": 4,
+      "created": "2024-01-20 22:13:00",
+      "updated": "2024-02-19 18:25:53",
+      "name_en": null,
+      "haveTerritory": true,
+      "description_en": null,
+      "compatiblePrograms": [
+        {
+          "display_id": "EPR-6727",
+          "id": 6727,
+          "name": "Roborace. PRO"
+        },
+        {
+          "display_id": "EPR-6639",
+          "id": 6639,
+          "name": "FIRA Challenge - Autonomous Cars"
+        }
+      ],
+      "image": {
+        "display_id": "FILE-196643",
+        "id": 196643,
+        "mime_type": "image\/jpeg",
+        "original_name": "rr-mini-2.jpg",
+        "file_size": 106874,
+        "height": 589,
+        "width": 1280,
+        "is_public": 1,
+        "timestamp_x": "2024-01-30 09:45:29",
+        "url": "\/files\/196643\/filename\/rr-mini-2.jpg"
+      },
+      "files": [],
+      "programStages": [
+        {
+          "display_id": "EPS-8904",
+          "id": 8904,
+          "name": "Квалификация",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 3,
+          "type_start": 1,
+          "type_final": 0,
+          "started_at": "2024-01-20 22:38:05",
+          "match_time": 60,
+          "status": 3,
+          "grounds": 1,
+          "statusLabel": "Завершено"
+        },
+        {
+          "display_id": "EPS-8905",
+          "id": 8905,
+          "name": "Отборочный заезд",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 1,
+          "type_start": 0,
+          "type_final": 0,
+          "started_at": "2024-01-20 22:38:05",
+          "match_time": 60,
+          "status": 3,
+          "grounds": 1,
+          "statusLabel": "Завершено"
+        },
+        {
+          "display_id": "EPS-8906",
+          "id": 8906,
+          "name": "Финальный заезд",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 1,
+          "type_start": 0,
+          "type_final": 1,
+          "started_at": "2024-01-20 22:38:05",
+          "match_time": 60,
+          "status": 3,
+          "grounds": 1,
+          "statusLabel": "Завершено"
+        }
+      ]
+    }
+  ]
+}

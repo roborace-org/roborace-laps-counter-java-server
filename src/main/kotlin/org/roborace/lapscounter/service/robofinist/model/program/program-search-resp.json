@@ -1,0 +1,166 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": [
+    {
+      "display_id": "EPR-8184",
+      "id": 8184,
+      "event_id": 1210,
+      "name": "Roborace. PRO",
+      "description": "<p>Соревнования Roborace во многом похожи на соревнования Формулы 1, но с тем отличием, что соревнуются не управляемые пилотами болиды, а полностью автономные роботы. Роботы полагаются на показания своих датчиков, чтобы ориентироваться по трассе (ограниченной бортами), маневрировать, выбирать скорость движения и избегать столкновений с соперниками.<\/p>",
+      "regulations_id": 3077,
+      "is_tournament": 1,
+      "check_unique_participant": 0,
+      "max_robot": 1,
+      "min_participant": 1,
+      "max_participant": 2,
+      "arRequiredRobotsFields": [
+        "file_image_id",
+        "content"
+      ],
+      "sort": 3,
+      "created": "2024-10-17 22:57:02",
+      "updated": "2024-10-18 10:00:39",
+      "name_en": null,
+      "haveTerritory": true,
+      "description_en": null,
+      "compatiblePrograms": [],
+      "image": null,
+      "files": [],
+      "programStages": [
+        {
+          "display_id": "EPS-11417",
+          "id": 11417,
+          "name": "Квалификация",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 3,
+          "type_start": 1,
+          "type_final": 0,
+          "started_at": "2024-10-17 22:57:02",
+          "match_time": 60,
+          "status": 3,
+          "grounds": 1,
+          "statusLabel": "Завершено"
+        },
+        {
+          "display_id": "EPS-11418",
+          "id": 11418,
+          "name": "Отборочный заезд",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 1,
+          "type_start": 0,
+          "type_final": 0,
+          "started_at": "2024-10-17 22:57:02",
+          "match_time": 60,
+          "status": 0,
+          "grounds": 1,
+          "statusLabel": "Открыта регистрация"
+        },
+        {
+          "display_id": "EPS-11419",
+          "id": 11419,
+          "name": "Финальный заезд",
+          "challonge_type": null,
+          "judging_type": null,
+          "arFormula": {
+            "name": "Круги",
+            "params": [
+              {
+                "id": "Laps",
+                "name": "Кол-во кругов",
+                "type": "number"
+              },
+              {
+                "id": "Time",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "results": [
+              {
+                "formula": "[p0]",
+                "name": "Круги",
+                "type": "number"
+              },
+              {
+                "formula": "[p1]",
+                "name": "Время",
+                "type": "time"
+              }
+            ],
+            "sort": "0:desc,1:asc",
+            "disq_reasons": "Не уложился в заданное время круга"
+          },
+          "count_single": 1,
+          "type_start": 0,
+          "type_final": 1,
+          "started_at": "2024-10-17 22:57:02",
+          "match_time": 60,
+          "status": 3,
+          "grounds": 1,
+          "statusLabel": "Завершено"
+        }
+      ]
+    }
+  ]
+}

@@ -3,15 +3,257 @@
   "code": 200,
   "data": [
     {
-      "display_id": "BID-97178",
-      "id": 97178,
-      "name": "робот тест",
+      "display_id": "BID-106354",
+      "id": 106354,
+      "name": "НРК",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-43245",
+          "id": 43245,
+          "name": "Университетский Лицей №1511 предуниверситария НИЯУ МИФИ"
+        },
+        {
+          "display_id": "ORG-2336",
+          "id": 2336,
+          "name": "НИЯУ МИФИ"
+        },
+        {
+          "display_id": "ORG-43759",
+          "id": 43759,
+          "name": "ГБУ ЦДиС \"ЛИЧНОСТЬ\""
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        }
+      ]
+    },
+    {
+      "display_id": "BID-109790",
+      "id": 109790,
+      "name": "IT Schumacher",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-42582",
+          "id": 42582,
+          "name": "ООО \"АйТи Скул\""
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-113379",
+      "id": 113379,
+      "name": "Радабокс-рейс",
       "status": 6,
       "organizations": [],
       "program_stages": [
         {
-          "display_id": "EPS-8922",
-          "id": 8922
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-113732",
+      "id": 113732,
+      "name": "Дубравка-про",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-2482",
+          "id": 2482,
+          "name": "ГБОУ \"Школа №1579\""
+        },
+        {
+          "display_id": "ORG-43759",
+          "id": 43759,
+          "name": "ГБУ ЦДиС \"ЛИЧНОСТЬ\""
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        }
+      ]
+    },
+    {
+      "display_id": "BID-113814",
+      "id": 113814,
+      "name": "ЧЕРТЁЖ ВЕРТЕРА IT_CLUB",
+      "status": 7,
+      "organizations": [
+        {
+          "display_id": "ORG-43936",
+          "id": 43936,
+          "name": "It_Club Двойной Чикаго "
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        }
+      ]
+    },
+    {
+      "display_id": "BID-113852",
+      "id": 113852,
+      "name": "Радабокс Рейс Мини",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-42984",
+          "id": 42984,
+          "name": "CyberLab"
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-114020",
+      "id": 114020,
+      "name": "MVR-13 Pro",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-42579",
+          "id": 42579,
+          "name": "STEM-класс RoboClever"
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-114024",
+      "id": 114024,
+      "name": "MGRobot-mini",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-42704",
+          "id": 42704,
+          "name": "ГУО \"Гимназия г. Мяделя\""
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-114238",
+      "id": 114238,
+      "name": "РобоЧерни Про",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-42735",
+          "id": 42735,
+          "name": "ГУО \"Средняя школа д.Черни\""
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
+        },
+        {
+          "display_id": "EPS-10079",
+          "id": 10079
+        },
+        {
+          "display_id": "EPS-10080",
+          "id": 10080
+        }
+      ]
+    },
+    {
+      "display_id": "BID-115111",
+      "id": 115111,
+      "name": "smart car 2",
+      "status": 6,
+      "organizations": [
+        {
+          "display_id": "ORG-44226",
+          "id": 44226,
+          "name": "Northeastern University"
+        }
+      ],
+      "program_stages": [
+        {
+          "display_id": "EPS-10078",
+          "id": 10078
         }
       ]
     }

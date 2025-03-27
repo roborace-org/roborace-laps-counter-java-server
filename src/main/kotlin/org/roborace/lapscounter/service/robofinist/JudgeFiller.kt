@@ -12,8 +12,8 @@ import org.roborace.lapscounter.service.robofinist.User.NECHAEV_VADIM_EVGENEVICH
 import org.roborace.lapscounter.service.robofinist.User.OGNEVAYA_TATYANA_ANATOLEVNA
 import org.roborace.lapscounter.service.robofinist.User.OGNEVOJ_VLADIMIR_DMITRIEVICH
 import org.roborace.lapscounter.service.robofinist.User.OHRIMCHUK_VALERIJ
+import org.roborace.lapscounter.service.robofinist.User.PAVLYUCHENKO_MAKSIM_YUREVICH
 import org.roborace.lapscounter.service.robofinist.User.SADOVNIKOV_VYACHESLAV
-import org.roborace.lapscounter.service.robofinist.User.SAFRONOV_ILYA_EDUARDOVICH
 import org.roborace.lapscounter.service.robofinist.User.SMIRNOV_EVGENIJ_ANDREEVICH
 import org.roborace.lapscounter.service.robofinist.User.TARASEVICH_ANATOLIJ_FEDOROVICH
 import org.roborace.lapscounter.service.robofinist.User.VOJTOVICH_PAVEL_LEONIDOVICH
@@ -66,11 +66,11 @@ object JudgeFiller {
         ),
         Program.BIG_JOURNEY_JR_OK to setOf(
             VOJTOVICH_PAVEL_LEONIDOVICH,
-            SAFRONOV_ILYA_EDUARDOVICH,
+            PAVLYUCHENKO_MAKSIM_YUREVICH,
         ),
         Program.BIG_JOURNEY_SR to setOf(
             VOJTOVICH_PAVEL_LEONIDOVICH,
-            SAFRONOV_ILYA_EDUARDOVICH,
+            PAVLYUCHENKO_MAKSIM_YUREVICH,
         ),
         Program.ROBOCUP_JUNIOR_RESCUE_LINE to setOf(
             GAVRILOV_ANDREJ_ANDREEVICH,
