@@ -17,7 +17,7 @@ repositories {
 dependencies {
     api("org.jetbrains.kotlin:kotlin-reflect")
     api("org.jetbrains.kotlin:kotlin-stdlib")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-websocket")
     testImplementation(kotlin("test"))
@@ -26,8 +26,8 @@ dependencies {
     testImplementation("javax.websocket:javax.websocket-client-api:1.1")
     testImplementation("org.glassfish.tyrus:tyrus-client:2.2.0")
     testImplementation("org.glassfish.tyrus:tyrus-container-grizzly:1.2.1")
-    testImplementation("org.awaitility:awaitility:4.2.2")
-    testImplementation("io.mockk:mockk-jvm:1.13.16")
+    testImplementation("org.awaitility:awaitility:4.3.0")
+    testImplementation("io.mockk:mockk-jvm:1.14.5")
 }
 
 configurations {
