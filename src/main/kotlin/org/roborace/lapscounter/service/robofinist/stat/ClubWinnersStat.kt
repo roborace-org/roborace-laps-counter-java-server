@@ -5,7 +5,7 @@ import org.roborace.lapscounter.service.robofinist.model.winners.WinnersSearchRe
 
 
 @Suppress("MagicNumber")
-fun main2() {
+fun main46() {
 
     val robofinist = Robofinist()
 
@@ -15,7 +15,11 @@ fun main2() {
 //        "МОЛР КУБОК" to listOf(1149),
 //        "КОР КУБОК" to listOf(1148),
 //        "МНРТ" to listOf(1030),
-        "КОР24/25" to listOf(1210)
+        "МОЛР" to listOf(1246,1255,1283,1328,1433),
+        "КОР" to listOf(1210,1270,1303,1349,1408),
+        "МОЛР КУБОК" to listOf(1414),
+        "КОР КУБОК" to listOf(1413),
+        "МНРТ" to listOf(1415)
     )
 
     val mapResult = mutableMapOf<String, Map<String, Map<Int, Int>>>()

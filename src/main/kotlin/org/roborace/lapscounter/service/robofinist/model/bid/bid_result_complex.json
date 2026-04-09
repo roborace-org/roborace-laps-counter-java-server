@@ -1,0 +1,372 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": {
+    "programs": [
+      {
+        "id": 10199,
+        "display_id": "EPR-10199",
+        "name": "Roborace. PRO Mini",
+        "program_stages": [
+          {
+            "id": 14399,
+            "name": "Квалификация",
+            "challonge_type": null,
+            "count_single": 3,
+            "status": 3,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Время круга",
+              "params": [
+                {
+                  "id": "Time",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "sort": "0:asc",
+              "disq_reasons": "Не уложился в заданное время круга"
+            },
+            "place": 5,
+            "results": {
+              "best": {
+                "id": 114437,
+                "program_stage_id": 14399,
+                "bid_id": 140466,
+                "arResults": [
+                  20.03
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  20.03
+                ],
+                "singleJudgings": []
+              },
+              "0": {
+                "id": 114437,
+                "program_stage_id": 14399,
+                "bid_id": 140466,
+                "arResults": [
+                  20.03
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  20.03
+                ],
+                "singleJudgings": []
+              }
+            },
+            "display_id": "EPS-14399"
+          },
+          {
+            "id": 14401,
+            "name": "Финальный заезд",
+            "challonge_type": null,
+            "count_single": 1,
+            "status": 3,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Круги",
+              "params": [
+                {
+                  "id": "Laps",
+                  "name": "Кол-во кругов",
+                  "type": "number"
+                },
+                {
+                  "id": "Time",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]",
+                  "name": "Круги",
+                  "type": "number"
+                },
+                {
+                  "formula": "[p1]",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "sort": "0:desc,1:asc",
+              "disq_reasons": "Не уложился в заданное время круга"
+            },
+            "place": 3,
+            "results": {
+              "best": {
+                "id": 114476,
+                "program_stage_id": 14401,
+                "bid_id": 140466,
+                "arResults": [
+                  21,
+                  584.1
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  21,
+                  584.1
+                ],
+                "singleJudgings": []
+              },
+              "0": {
+                "id": 114476,
+                "program_stage_id": 14401,
+                "bid_id": 140466,
+                "arResults": [
+                  21,
+                  584.1
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  21,
+                  584.1
+                ],
+                "singleJudgings": []
+              }
+            },
+            "display_id": "EPS-14401"
+          }
+        ],
+        "place": 3
+      },
+      {
+        "id": 10230,
+        "display_id": "EPR-10230",
+        "name": "FIRA Challenge - Autonomous Cars",
+        "program_stages": [
+          {
+            "id": 14481,
+            "name": "Трасса",
+            "challonge_type": null,
+            "count_single": 3,
+            "status": 3,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Автономная гонка (трасса)",
+              "params": [
+                {
+                  "id": "Ka",
+                  "name": "коэффициент автономности( Ka = 0,5 если вычисления не на борту автомобиля, Ka = 1 если вычисления на борту автомобиля)",
+                  "type": "number"
+                },
+                {
+                  "id": "Tstage",
+                  "name": "время в секундах, отведенное на заезд",
+                  "type": "number"
+                },
+                {
+                  "id": "Ncp",
+                  "name": "общее число чекпоинтов, которые необходимо пройти",
+                  "type": "number"
+                },
+                {
+                  "id": "cp",
+                  "name": "количество пройденных чекпоинтов",
+                  "type": "number"
+                },
+                {
+                  "id": "Ttotal",
+                  "name": "время автомобиля в секундах, затраченное на заезд",
+                  "type": "number"
+                },
+                {
+                  "id": "Lcp",
+                  "name": "количество пропущенных чекпоинтов",
+                  "type": "number"
+                },
+                {
+                  "id": "Lel",
+                  "name": "количество потерянных элементов",
+                  "type": "number"
+                },
+                {
+                  "id": "Time",
+                  "name": "время заезда",
+                  "type": "time"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]*((1+if([p1]>([p4]+[p5]*0.5*([p1]\/[p2])+[p6]*0.2*([p1]\/[p2])),([p1]-([p4]+[p5]*0.5*([p1]\/[p2])+[p6]*0.2*([p1]\/[p2])))\/[p1],0))*35*[p3])",
+                  "name": "Очки за трассу",
+                  "type": "number"
+                },
+                {
+                  "formula": "[p7]",
+                  "name": "Время заезда",
+                  "type": "time"
+                }
+              ],
+              "sort": "0:desc,1:asc",
+              "disq_reasons": ""
+            },
+            "place": 2,
+            "results": {
+              "best": {
+                "id": 114525,
+                "program_stage_id": 14481,
+                "bid_id": 140466,
+                "arResults": [
+                  197.17833,
+                  34.99
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  1,
+                  120,
+                  10,
+                  4,
+                  34.99,
+                  6,
+                  0,
+                  34.99
+                ],
+                "singleJudgings": []
+              },
+              "0": {
+                "id": 114525,
+                "program_stage_id": 14481,
+                "bid_id": 140466,
+                "arResults": [
+                  197.17833,
+                  34.99
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  1,
+                  120,
+                  10,
+                  4,
+                  34.99,
+                  6,
+                  0,
+                  34.99
+                ],
+                "singleJudgings": []
+              }
+            },
+            "display_id": "EPS-14481"
+          },
+          {
+            "id": 14482,
+            "name": "Город",
+            "challonge_type": null,
+            "count_single": 3,
+            "status": 0,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Вождение в городе",
+              "params": [
+                {
+                  "id": "Ka1",
+                  "name": "коэффициент автономности (Ka1 = 0,5 если вычисления не на борту автомобиля, Ka1 = 1 если вычисления на борту автомобиля)",
+                  "type": "number"
+                },
+                {
+                  "id": "Ka2",
+                  "name": "коэффициент чтения знаков (Ka2 = 1 если распознавание April меток, Ka2 = 1,3 если распознавание знаков)",
+                  "type": "number"
+                },
+                {
+                  "id": "Ncp",
+                  "name": "количество пройденных чекпоинтов",
+                  "type": "number"
+                },
+                {
+                  "id": "Np1",
+                  "name": "количество перекрестков без остановки",
+                  "type": "number"
+                },
+                {
+                  "id": "Np2",
+                  "name": "количество неправильного выбора направления движения",
+                  "type": "number"
+                },
+                {
+                  "id": "Np3",
+                  "name": "количество неправильного перестроения между полосами",
+                  "type": "number"
+                },
+                {
+                  "id": "Nd",
+                  "name": "количество правильного выбранного направления движения на перекрестке",
+                  "type": "number"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "max(0, [p0]*[p1]*(([p2]+[p6])*60-[p3]*10-[p4]*30-[p5]*20))",
+                  "name": "Очки за город",
+                  "type": "number"
+                }
+              ],
+              "sort": "0:desc",
+              "disq_reasons": ""
+            },
+            "place": null,
+            "results": [],
+            "display_id": "EPS-14482"
+          },
+          {
+            "id": 14483,
+            "name": "Сумма",
+            "challonge_type": null,
+            "count_single": 3,
+            "status": 0,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Сумма баллов",
+              "params": [
+                {
+                  "id": "S1",
+                  "name": "очки за трассу",
+                  "type": "number"
+                },
+                {
+                  "id": "S2",
+                  "name": "очки за город",
+                  "type": "number"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]+[p1]",
+                  "name": "Сумма",
+                  "type": "number"
+                }
+              ],
+              "sort": "0:desc",
+              "disq_reasons": ""
+            },
+            "place": null,
+            "results": [],
+            "display_id": "EPS-14483"
+          }
+        ],
+        "place": 2
+      }
+    ]
+  }
+}

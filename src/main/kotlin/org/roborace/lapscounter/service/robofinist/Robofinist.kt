@@ -5,6 +5,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.roborace.lapscounter.service.robofinist.model.BaseRequest
 import org.roborace.lapscounter.service.robofinist.model.bid.BidParticipantsRequest
 import org.roborace.lapscounter.service.robofinist.model.bid.BidParticipantsResponse
+import org.roborace.lapscounter.service.robofinist.model.bid.BidResultRequest
+import org.roborace.lapscounter.service.robofinist.model.bid.BidResultResponse
 import org.roborace.lapscounter.service.robofinist.model.bids.BidsSearchRequest
 import org.roborace.lapscounter.service.robofinist.model.bids.BidsSearchResponse
 import org.roborace.lapscounter.service.robofinist.model.event.EventAdminAddRequest
@@ -658,6 +660,9 @@ class Robofinist {
     fun getWinners(programId: Int): WinnersSearchResponse? =
         client.execute(WinnersSearchRequest(programId = programId), WinnersSearchResponse::class.java)
 
+    fun getBidsResults(bidId: Int): BidResultResponse.BidResultData? =
+        client.execute(BidResultRequest(bidId = bidId), BidResultResponse::class.java)?.data
+
     fun createResult() {
         client.executeV1(ResultCreateRequest(
             stageId = 8922,
@@ -744,6 +749,7 @@ class LoggingRequestInterceptor : ClientHttpRequestInterceptor {
 }
 
 class RobofinistClient {
+
     private val restTemplate = RestTemplate()
 
     //        .apply { interceptors.add(LoggingRequestInterceptor()) }
@@ -757,7 +763,7 @@ class RobofinistClient {
             requestCount++
             println("Execute request #$requestCount $url_v2")
             println(request)
-            val response = restTemplate.postForEntity(url_v2, request, String::class.java)
+            val response = restTemplate.postForEntity(url_v2, `request`, String::class.java)
             println(response.statusCode)
             println(response.body)
             return response.body
@@ -774,8 +780,10 @@ class RobofinistClient {
             println(objectMapper.writeValueAsString(request))
             val response = restTemplate.postForEntity(url_v2, request, String::class.java)
             println(response.statusCode)
-            println(response.body)
-            return objectMapper.readValue(response.body, outClass)
+            val body = response.body
+                ?.replace("\"results\":[]", "\"results\":{}")
+            println(body)
+            return objectMapper.readValue(body, outClass)
         } catch (e: Exception) {
             println(e.message)
             return null
@@ -798,8 +806,8 @@ class RobofinistClient {
     companion object {
 //            private const val url_v2 = "https://robofinist.by/api/v2"
 
-        private const val url_v2 = "https://robofinist.ru/api/v2"
-        private const val url_v1 = "https://robofinist.ru/api/v1/"
+        private const val url_v2 = "https://robofinist.by/api/v2"
+        private const val url_v1 = "https://robofinist.by/api/v1/"
         const val commonToken = "token"
 
     }
@@ -808,12 +816,17 @@ class RobofinistClient {
 @Suppress("MagicNumber")
 fun main() {
 
-    val eventId = 1349
+    val eventId = 1669
     val robofinist = Robofinist()
 
-    robofinist.setEventMapPoint(eventId)
+//    robofinist.setEventMapPoint(eventId)
     robofinist.createPartners(eventId)
+    return
     var programsMap = robofinist.eventProgramsSearch(eventId = eventId)
+
+//    programsMap.values.forEach { it->
+//        robofinist.eventProgramSearch(it)
+//    }
 
     robofinist.createRoboraceProgram(eventId, Program.ROBORACE_PRO, programsMap)
     robofinist.createRoboraceProgram(eventId, Program.ROBORACE_PRO_MINI, programsMap)

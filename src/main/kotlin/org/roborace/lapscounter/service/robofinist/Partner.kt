@@ -11,6 +11,7 @@ enum class Partner(val id: Int, val orgName: String, val type: Int = 3) {
     VECTOR(43948, "Клуб робототехники, электроники и программирования VECTOR"),
     IMPULS(42694, "Клуб робототехники \"Импульс\""),
     CYBERLAB(43952, "CyberLab"),
+    KODWARS(44698, "IT-Клуб робототехники и программирования \"Кодвартс\""),
     NEXTLEVEL(2090, "Учебный центр NEXT LEVEL"),
     PINMODE(2364, "Клуб технического творчества \"pinMode\""),
     ROBOCLEVER(42579, "STEM-класс RoboClever"),

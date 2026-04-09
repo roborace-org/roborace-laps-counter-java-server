@@ -1,0 +1,182 @@
+{
+  "errors": [],
+  "code": 200,
+  "data": {
+    "programs": [
+      {
+        "id": 10198,
+        "display_id": "EPR-10198",
+        "name": "Roborace. PRO",
+        "program_stages": [
+          {
+            "id": 14396,
+            "name": "Квалификация",
+            "challonge_type": null,
+            "count_single": 3,
+            "status": 3,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Время круга",
+              "params": [
+                {
+                  "id": "Time",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "sort": "0:asc",
+              "disq_reasons": "Не уложился в заданное время круга"
+            },
+            "place": 3,
+            "results": {
+              "best": {
+                "id": 114481,
+                "program_stage_id": 14396,
+                "bid_id": 140941,
+                "arResults": [
+                  10.19
+                ],
+                "number": 3,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  10.19
+                ],
+                "singleJudgings": []
+              },
+              "0": {
+                "id": 114479,
+                "program_stage_id": 14396,
+                "bid_id": 140941,
+                "arResults": [
+                  10.63
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  10.63
+                ],
+                "singleJudgings": []
+              },
+              "1": {
+                "id": 114480,
+                "program_stage_id": 14396,
+                "bid_id": 140941,
+                "arResults": [
+                  11.9
+                ],
+                "number": 2,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  11.9
+                ],
+                "singleJudgings": []
+              },
+              "2": {
+                "id": 114481,
+                "program_stage_id": 14396,
+                "bid_id": 140941,
+                "arResults": [
+                  10.19
+                ],
+                "number": 3,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  10.19
+                ],
+                "singleJudgings": []
+              }
+            },
+            "display_id": "EPS-14396"
+          },
+          {
+            "id": 14398,
+            "name": "Финальный заезд",
+            "challonge_type": null,
+            "count_single": 1,
+            "status": 3,
+            "judging_type": null,
+            "arFormula": {
+              "name": "Круги",
+              "params": [
+                {
+                  "id": "Laps",
+                  "name": "Кол-во кругов",
+                  "type": "number"
+                },
+                {
+                  "id": "Time",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "results": [
+                {
+                  "formula": "[p0]",
+                  "name": "Круги",
+                  "type": "number"
+                },
+                {
+                  "formula": "[p1]",
+                  "name": "Время",
+                  "type": "time"
+                }
+              ],
+              "sort": "0:desc,1:asc",
+              "disq_reasons": "Не уложился в заданное время круга"
+            },
+            "place": 2,
+            "results": {
+              "best": {
+                "id": 114487,
+                "program_stage_id": 14398,
+                "bid_id": 140941,
+                "arResults": [
+                  41,
+                  592.9
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  41,
+                  592.9
+                ],
+                "singleJudgings": []
+              },
+              "0": {
+                "id": 114487,
+                "program_stage_id": 14398,
+                "bid_id": 140941,
+                "arResults": [
+                  41,
+                  592.9
+                ],
+                "number": 1,
+                "disqualification": 0,
+                "reason": null,
+                "params": [
+                  41,
+                  592.9
+                ],
+                "singleJudgings": []
+              }
+            },
+            "display_id": "EPS-14398"
+          }
+        ],
+        "place": 2
+      }
+    ]
+  }
+}
