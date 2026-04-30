@@ -1,10 +1,10 @@
 plugins {
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.14"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("jvm") version "2.1.10"
     kotlin("plugin.spring") version "2.1.10"
     id("net.researchgate.release") version "3.1.0"
-    id("com.github.ben-manes.versions") version "0.52.0"
+    id("com.github.ben-manes.versions") version "0.54.0"
 }
 
 repositories {
@@ -17,7 +17,7 @@ repositories {
 dependencies {
     api("org.jetbrains.kotlin:kotlin-reflect")
     api("org.jetbrains.kotlin:kotlin-stdlib")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3")
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-websocket")
     testImplementation(kotlin("test"))
@@ -27,7 +27,7 @@ dependencies {
     testImplementation("org.glassfish.tyrus:tyrus-client:2.2.0")
     testImplementation("org.glassfish.tyrus:tyrus-container-grizzly:1.2.1")
     testImplementation("org.awaitility:awaitility:4.3.0")
-    testImplementation("io.mockk:mockk-jvm:1.14.5")
+    testImplementation("io.mockk:mockk-jvm:1.14.9")
 }
 
 configurations {
