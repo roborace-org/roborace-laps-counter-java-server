@@ -1,14 +1,15 @@
 package org.roborace.lapscounter.service
 
+import mu.KotlinLogging
 import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.Timer
 import java.util.TimerTask
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class LapsCounterScheduler(
@@ -24,25 +25,25 @@ class LapsCounterScheduler(
             .joinToString(", ") {
                 "${it.remoteAddress} open:${it.isOpen}"
             }.also {
-                log.debug("Connected websocket clients: {}", it)
+                logger.debug("Connected websocket clients: {}", it)
             }
     }
 
     fun addSchedulerForFinishRace(targetMs: Long) {
-        log.info("Scheduling finish in $targetMs ms")
+        logger.info("Scheduling finish in $targetMs ms")
         addScheduler(targetMs - lapsCounterService.stopwatch.time()) {
             while (lapsCounterService.stopwatch.time() < targetMs) Thread.yield()
             lapsCounterService.handleMessage(FINISH_MESSAGE).also {
                 webSocketHandler.broadcast(it.messages)
             }
-            log.info("Race is finished by time limit")
+            logger.info("Race is finished by time limit")
         }
     }
 
     fun addSchedulerForPitStop(message: Message, delayMs: Long) {
         addScheduler(delayMs) {
             webSocketHandler.broadcast(message)
-            log.info("Pit stop is finished ${message.serial}")
+            logger.info("Pit stop is finished ${message.serial}")
         }
     }
 
@@ -64,8 +65,6 @@ class LapsCounterScheduler(
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(LapsCounterService::class.java)
-
         private val FINISH_MESSAGE = Message(Type.COMMAND, state = State.FINISH)
     }
 }

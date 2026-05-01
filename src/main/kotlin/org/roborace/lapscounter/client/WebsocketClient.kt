@@ -10,15 +10,16 @@ import jakarta.websocket.OnError
 import jakarta.websocket.OnMessage
 import jakarta.websocket.OnOpen
 import jakarta.websocket.Session
+import mu.KotlinLogging
 import org.roborace.lapscounter.domain.State
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.URI
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
+
+private val logger = KotlinLogging.logger {}
 
 @ClientEndpoint
 class WebsocketClient(endpointURI: URI, val name: String) {
@@ -33,37 +34,37 @@ class WebsocketClient(endpointURI: URI, val name: String) {
 
     @OnOpen
     fun onOpen(userSession: Session) {
-        log.info("[{}] Opening websocket userSession = [{}]", name, userSession.id)
+        logger.info("[{}] Opening websocket userSession = [{}]", name, userSession.id)
     }
 
     @OnClose
     fun onClose(userSession: Session, reason: CloseReason) {
-        log.info("[{}] Closing websocket userSession = [{}], reason = [{}]", name, userSession.id, reason)
+        logger.info("[{}] Closing websocket userSession = [{}], reason = [{}]", name, userSession.id, reason)
     }
 
     @OnError
     fun onError(t: Throwable) {
-        log.error("[{}] Websocket error = [{}]", name, t.message)
+        logger.error("[{}] Websocket error = [{}]", name, t.message)
     }
 
     @OnMessage
     fun onMessage(message: String) {
-        log.info("[{}] Message received = [{}]", name, message)
+        logger.info("[{}] Message received = [{}]", name, message)
         messages.add(objectMapper.readValue(message, Message::class.java))
     }
 
     fun sendMessage(message: String) {
-        log.info("[{}] Send message = [{}]", name, message)
+        logger.info("[{}] Send message = [{}]", name, message)
         userSession.asyncRemote.sendText(message)
     }
 
     fun closeClient() {
-        log.info("Close client $name!")
+        logger.info("Close client $name!")
         if (userSession.isOpen) {
             try {
                 userSession.close(CloseReason(CloseCodes.NORMAL_CLOSURE, "close client"))
             } catch (e: IOException) {
-                log.warn("Error closing session: ${e.message}", e)
+                logger.warn("Error closing session: ${e.message}", e)
             }
         }
     }
@@ -87,7 +88,6 @@ class WebsocketClient(endpointURI: URI, val name: String) {
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(WebsocketClient::class.java)
         private val objectMapper = jacksonObjectMapper()
     }
 }

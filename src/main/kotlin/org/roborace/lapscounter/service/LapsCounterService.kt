@@ -1,12 +1,10 @@
 package org.roborace.lapscounter.service
 
+import mu.KotlinLogging
 import org.roborace.lapscounter.domain.LapsCounterException
 import org.roborace.lapscounter.domain.Robot
 import org.roborace.lapscounter.domain.State
-import org.roborace.lapscounter.domain.State.FINISH
-import org.roborace.lapscounter.domain.State.READY
-import org.roborace.lapscounter.domain.State.RUNNING
-import org.roborace.lapscounter.domain.State.STEADY
+import org.roborace.lapscounter.domain.State.*
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.api.Message
 import org.roborace.lapscounter.domain.api.MessageResult
@@ -14,13 +12,13 @@ import org.roborace.lapscounter.domain.api.MessageResult.Companion.broadcast
 import org.roborace.lapscounter.domain.api.MessageResult.Companion.single
 import org.roborace.lapscounter.domain.api.ResponseType
 import org.roborace.lapscounter.service.util.Stopwatch
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class LapsCounterService(
@@ -112,7 +110,7 @@ class LapsCounterService(
         val existing = findRobot(serial)
         val robot: Robot =
             if (existing != null) {
-                log.info("Reconnect robot {}", existing)
+                logger.info("Reconnect robot {}", existing)
                 existing
             } else {
                 Robot(
@@ -124,10 +122,10 @@ class LapsCounterService(
                     it.reset()
                     robots.add(it)
                     frameProcessor.robotInit(it.serial)
-                    log.info("Connect new robot {}", it)
+                    logger.info("Connect new robot {}", it)
                 }
             }
-        log.debug("Connected robots: {}", robots)
+        logger.debug("Connected robots: {}", robots)
         return broadcast(getLap(robot))
     }
 
@@ -135,7 +133,7 @@ class LapsCounterService(
 
     private fun robotEdit(message: Message): MessageResult {
         val robot = findRobotOrElseThrow(message.serial)
-        log.info("Edit robot {}", robot)
+        logger.info("Edit robot {}", robot)
         robot.name = message.name
         return broadcast(getLap(robot))
     }
@@ -155,7 +153,7 @@ class LapsCounterService(
 
     private fun lapManual(message: Message): MessageResult {
         if (state != RUNNING) {
-            log.info("Lap manual ignored: state is not running")
+            logger.info("Lap manual ignored: state is not running")
             throw LapsCounterException("Lap manual ignored: state is not running")
         }
         if (message.laps == null) {
@@ -184,13 +182,13 @@ class LapsCounterService(
 
     private fun pitStop(message: Message): MessageResult {
         if (state != RUNNING) {
-            log.debug("PitStop ignored: state is not running")
+            logger.debug("PitStop ignored: state is not running")
             throw LapsCounterException("PitStop ignored: state is not running")
         }
         val robot = findRobotOrElseThrow(message.serial)
 
         robot.pitStopFinishTime = stopwatch.time() + pitStopTime
-        log.info("Used PIT_STOP for robot: {}", robot.serial)
+        logger.info("Used PIT_STOP for robot: {}", robot.serial)
 
         val pitStopFinish = Message(Type.PIT_STOP_FINISH, serial = robot.serial)
         lapsCounterScheduler.addSchedulerForPitStop(pitStopFinish, pitStopTime)
@@ -201,11 +199,11 @@ class LapsCounterService(
 
     private fun frame(message: Message): MessageResult {
         if (state != RUNNING) {
-            log.debug("Frame ignored: state is not running")
+            logger.debug("Frame ignored: state is not running")
             return MessageResult(ResponseType.SINGLE)
         }
         if (message.frame == null) {
-            log.debug("Frame is null")
+            logger.debug("Frame is null")
             return MessageResult(ResponseType.SINGLE)
         }
         val robot = findRobotOrElseThrow(message.serial)
@@ -252,7 +250,7 @@ class LapsCounterService(
 
     fun scheduled(): Message =
         timeMessage().also {
-            log.debug("Send time")
+            logger.debug("Send time")
         }
 
     fun getState(): Message = Message(Type.STATE, state = state)
@@ -284,7 +282,4 @@ class LapsCounterService(
                 robots.find { it.serial == serialNotNull }
             }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(LapsCounterService::class.java)
-    }
 }
