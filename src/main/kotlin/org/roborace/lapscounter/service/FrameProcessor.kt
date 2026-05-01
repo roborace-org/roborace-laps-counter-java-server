@@ -1,11 +1,12 @@
 package org.roborace.lapscounter.service
 
+import mu.KotlinLogging
 import org.roborace.lapscounter.domain.Type
 import org.roborace.lapscounter.domain.frame.FrameRobotInfo
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class FrameProcessor(
@@ -27,14 +28,14 @@ class FrameProcessor(
 
     fun checkFrame(serial: Int, frame: Int, raceTime: Long) =
         getFrameResult(serial, frame, raceTime).also {
-            log.info("Frame result: {}, {}, robot: {}", it, frame, serial)
+            logger.info("Frame result: {}, {}, robot: {}", it, frame, serial)
         }
 
     fun isStartFrame(frame: Int) = frames[0] == frame
 
     private fun getFrameResult(serial: Int, frame: Int, raceTime: Long): Type {
         if (!frames.contains(frame)) {
-            log.warn("Frame not found: {}, robot: {}", frame, serial)
+            logger.warn("Frame not found: {}, robot: {}", frame, serial)
             return Type.ERROR
         }
 
@@ -42,11 +43,11 @@ class FrameProcessor(
 
         return when {
             frameRobotInfo == null ->
-                Type.ERROR.also { log.warn("Robot [{}] is not init", serial) }
+                Type.ERROR.also { logger.warn("Robot [{}] is not init", serial) }
 
             isTooQuick(raceTime, frameRobotInfo.lastFrameTime) && frameRobotInfo.frames.isNotEmpty() ->
                 Type.ERROR.also {
-                    log.warn("Frame is not counted (too quick): {}, robot: {}", frame, serial)
+                    logger.warn("Frame is not counted (too quick): {}, robot: {}", frame, serial)
                 }
 
             else -> checkFrame(frameRobotInfo, frame, raceTime)
@@ -130,7 +131,4 @@ class FrameProcessor(
     private fun isTooQuick(raceTime: Long, lastFrameTime: Long) =
         raceTime < lastFrameTime + safeInterval
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(FrameProcessor::class.java)
-    }
 }

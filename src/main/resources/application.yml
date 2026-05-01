@@ -1,6 +1,9 @@
 server:
   port: 8888
 
+logging.level.root: INFO
+logging.level.org.roborace.lapscounter: DEBUG
+
 laps:
   safe-interval: 1000
   frames: 0xAA00, 0xAA01, 0xAA02

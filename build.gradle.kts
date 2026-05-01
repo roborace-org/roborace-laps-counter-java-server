@@ -20,6 +20,7 @@ dependencies {
     api("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3")
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("io.github.microutils:kotlin-logging:3.0.5")
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
