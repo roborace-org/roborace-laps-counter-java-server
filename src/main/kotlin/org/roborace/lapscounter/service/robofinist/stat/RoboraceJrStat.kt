@@ -9,8 +9,10 @@ fun main2() {
 
     val robofinist = Robofinist()
 
-    val events = listOf(1246, 1255, 1283, 1328, 1433) // molr
+//    val events = listOf(1246, 1255, 1283, 1328, 1433) // molr
 //    val events = listOf(1210, 1270, 1303, 1349, 1408) // kor
+
+    val events = listOf(1510, 1583, 1536, 1649, 1669) // 2026
 
 
     val mapResult = getMapForEvents(robofinist, eventIds = events)
