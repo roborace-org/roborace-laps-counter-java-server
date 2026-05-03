@@ -8,3 +8,9 @@ laps:
   safe-interval: 1000
   frames: 0xAA00, 0xAA01, 0xAA02
   pit-stop-time: 60000
+
+robofinist:
+  enabled: true
+  url.v2: https://robofinist.ru/api/v2
+  token: $TOKEN
+  partnerId: 44303
