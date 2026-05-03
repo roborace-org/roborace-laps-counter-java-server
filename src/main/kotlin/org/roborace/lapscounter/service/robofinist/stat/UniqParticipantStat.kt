@@ -4,7 +4,7 @@ import org.roborace.lapscounter.service.robofinist.Robofinist
 import org.roborace.lapscounter.service.robofinist.model.bids.BidsSearchResponse
 
 
-const val CSV_SEPARATOR = ","
+const val CSV_SEPARATOR = ";"
 
 data class CompetitionStat(
     val program: String,
