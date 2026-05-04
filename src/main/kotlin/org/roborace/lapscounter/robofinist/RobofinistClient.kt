@@ -2,12 +2,16 @@ package org.roborace.lapscounter.robofinist
 
 import mu.KotlinLogging
 import org.roborace.lapscounter.robofinist.model.BaseRequest
+import org.roborace.lapscounter.robofinist.model.bid.BidChangeStatusRequest
+import org.roborace.lapscounter.robofinist.model.bid.BidChangeStatusResponse
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchResponse
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchRequest
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchResponse
 import org.roborace.lapscounter.robofinist.model.program.ProgramSearchRequest
 import org.roborace.lapscounter.robofinist.model.program.ProgramSearchResponse
+import org.roborace.lapscounter.robofinist.model.stage.StageSearchRequest
+import org.roborace.lapscounter.robofinist.model.stage.StageSearchResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -31,6 +35,12 @@ class RobofinistClient(
 
     fun getBids(programId: Long): BidSearchResponse =
         execute<BidSearchResponse>(BidSearchRequest(programId = programId))
+
+    fun getStages(programId: Long): StageSearchResponse =
+        execute<StageSearchResponse>(StageSearchRequest(programId = programId))
+
+    fun changeBidStatus(bidId: Int, statusId: Int): BidChangeStatusResponse =
+        execute<BidChangeStatusResponse>(BidChangeStatusRequest(bidId = bidId, statusId = statusId))
 
     private inline fun <reified T> execute(request: BaseRequest): T {
         try {

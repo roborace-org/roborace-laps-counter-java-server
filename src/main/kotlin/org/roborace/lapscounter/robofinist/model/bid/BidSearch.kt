@@ -11,3 +11,12 @@ data class BidSearchRequest(
 data class BidSearchResponse(
     @param:JsonProperty("data") val data: List<Bid>,
 )
+
+data class BidChangeStatusRequest(
+    @get:JsonProperty("bid_id") val bidId: Int,
+    @get:JsonProperty("status_id") val statusId: Int,
+) : BaseRequest(url = "event/admin/bid/ChangeStatus")
+
+data class BidChangeStatusResponse(
+    val code: Int?,
+)

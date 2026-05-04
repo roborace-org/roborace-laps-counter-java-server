@@ -2,9 +2,11 @@ package org.roborace.lapscounter.robofinist
 
 import mu.KotlinLogging
 import org.roborace.lapscounter.robofinist.model.bid.Bid
+import org.roborace.lapscounter.robofinist.model.bid.BidStatus
 import org.roborace.lapscounter.robofinist.model.event.Event
 import org.roborace.lapscounter.robofinist.model.event.EventDto
 import org.roborace.lapscounter.robofinist.model.program.ProgramDto
+import org.roborace.lapscounter.robofinist.model.stage.Stage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -52,8 +54,19 @@ class RobofinistService(
             .filter { it.name.startsWith("Roborace") }
             .map { ProgramDto(it.id, it.name) }
 
-    fun getBids(programId: Long): List<Bid> = robofinistClient.getBids(programId = programId).data
+    fun getStages(programId: Long): List<Stage> = robofinistClient.getStages(programId = programId).data
 
+    fun getBids(programId: Long): List<Bid> =
+        robofinistClient.getBids(programId = programId).data
+            .sortedBy { bid -> bid.status }
+
+    fun markBidParticipated(bidId: Int) {
+        robofinistClient.changeBidStatus(bidId = bidId, statusId = BidStatus.PARTICIPATED.code)
+    }
+
+    fun markBidAbsence(bidId: Int) {
+        robofinistClient.changeBidStatus(bidId = bidId, statusId = BidStatus.ABSENCE.code)
+    }
 
     companion object {
         private val korRegex = "Куб.+ по образовательной робототехнике".toRegex()
