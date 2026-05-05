@@ -10,3 +10,12 @@ data class StageSearchRequest(
 data class StageSearchResponse(
     val data: List<Stage>,
 )
+
+data class StageEditRequest(
+    @get:JsonProperty("stage_id") val stageId: Long,
+    @get:JsonProperty("status") val status: Int,
+) : BaseRequest(url = "event/program/stage/SetStatus")
+
+data class StageEditResponse(
+    val code: Int?,
+)

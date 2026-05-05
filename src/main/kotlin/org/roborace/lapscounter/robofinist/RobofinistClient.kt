@@ -10,6 +10,8 @@ import org.roborace.lapscounter.robofinist.model.event.EventsSearchRequest
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchResponse
 import org.roborace.lapscounter.robofinist.model.program.ProgramSearchRequest
 import org.roborace.lapscounter.robofinist.model.program.ProgramSearchResponse
+import org.roborace.lapscounter.robofinist.model.stage.StageEditRequest
+import org.roborace.lapscounter.robofinist.model.stage.StageEditResponse
 import org.roborace.lapscounter.robofinist.model.stage.StageSearchRequest
 import org.roborace.lapscounter.robofinist.model.stage.StageSearchResponse
 import org.springframework.beans.factory.annotation.Value
@@ -41,6 +43,9 @@ class RobofinistClient(
 
     fun changeBidStatus(bidId: Int, statusId: Int): BidChangeStatusResponse =
         execute<BidChangeStatusResponse>(BidChangeStatusRequest(bidId = bidId, statusId = statusId))
+
+    fun editStage(stageId: Long, status: Int): StageEditResponse =
+        execute<StageEditResponse>(StageEditRequest(stageId = stageId, status = status))
 
     private inline fun <reified T> execute(request: BaseRequest): T {
         try {

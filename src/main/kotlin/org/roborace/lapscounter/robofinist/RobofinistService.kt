@@ -7,6 +7,7 @@ import org.roborace.lapscounter.robofinist.model.event.Event
 import org.roborace.lapscounter.robofinist.model.event.EventDto
 import org.roborace.lapscounter.robofinist.model.program.ProgramDto
 import org.roborace.lapscounter.robofinist.model.stage.Stage
+import org.roborace.lapscounter.robofinist.model.stage.StageStatus
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -66,6 +67,11 @@ class RobofinistService(
 
     fun markBidAbsence(bidId: Int) {
         robofinistClient.changeBidStatus(bidId = bidId, statusId = BidStatus.ABSENCE.code)
+    }
+
+    fun startStage(stageId: Long) {
+        robofinistClient.editStage(stageId = stageId, status = StageStatus.FORMING.code)
+        robofinistClient.editStage(stageId = stageId, status = StageStatus.IN_PROGRESS.code)
     }
 
     companion object {

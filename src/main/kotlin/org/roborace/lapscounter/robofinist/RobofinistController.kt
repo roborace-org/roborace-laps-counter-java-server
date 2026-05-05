@@ -36,4 +36,7 @@ class RobofinistController(
     @PostMapping("/bids/{bidId}/absence")
     fun markBidAbsence(@PathVariable bidId: Int) = robofinistService.markBidAbsence(bidId)
 
+    @PostMapping("/stages/{stageId}/start")
+    fun startStage(@PathVariable stageId: Long) = robofinistService.startStage(stageId)
+
 }
