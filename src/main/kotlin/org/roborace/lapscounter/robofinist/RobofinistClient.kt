@@ -4,6 +4,8 @@ import mu.KotlinLogging
 import org.roborace.lapscounter.robofinist.model.BaseRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidChangeStatusRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidChangeStatusResponse
+import org.roborace.lapscounter.robofinist.model.bid.BidResultRequest
+import org.roborace.lapscounter.robofinist.model.bid.BidResultResponse
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchResponse
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchRequest
@@ -43,6 +45,9 @@ class RobofinistClient(
 
     fun changeBidStatus(bidId: Int, statusId: Int): BidChangeStatusResponse =
         execute<BidChangeStatusResponse>(BidChangeStatusRequest(bidId = bidId, statusId = statusId))
+
+    fun getBidResults(bidId: Int): BidResultResponse =
+        execute<BidResultResponse>(BidResultRequest(bidId = bidId))
 
     fun editStage(stageId: Long, status: Int): StageEditResponse =
         execute<StageEditResponse>(StageEditRequest(stageId = stageId, status = status))

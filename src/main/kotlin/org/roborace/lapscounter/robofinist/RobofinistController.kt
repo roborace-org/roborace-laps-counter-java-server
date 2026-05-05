@@ -1,5 +1,6 @@
 package org.roborace.lapscounter.robofinist
 
+import org.roborace.lapscounter.robofinist.model.QualificationResult
 import org.roborace.lapscounter.robofinist.model.bid.Bid
 import org.roborace.lapscounter.robofinist.model.event.EventDto
 import org.roborace.lapscounter.robofinist.model.program.ProgramDto
@@ -38,5 +39,11 @@ class RobofinistController(
 
     @PostMapping("/stages/{stageId}/start")
     fun startStage(@PathVariable stageId: Long) = robofinistService.startStage(stageId)
+
+    @GetMapping("/programs/{programId}/stages/{stageId}/results")
+    fun getQualificationResults(
+        @PathVariable programId: Long,
+        @PathVariable stageId: Long
+    ): List<QualificationResult> = robofinistService.getQualificationResults(programId, stageId)
 
 }

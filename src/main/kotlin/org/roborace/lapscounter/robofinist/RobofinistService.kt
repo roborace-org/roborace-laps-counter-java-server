@@ -1,6 +1,8 @@
 package org.roborace.lapscounter.robofinist
 
 import mu.KotlinLogging
+import org.roborace.lapscounter.robofinist.model.AttemptResult
+import org.roborace.lapscounter.robofinist.model.QualificationResult
 import org.roborace.lapscounter.robofinist.model.bid.Bid
 import org.roborace.lapscounter.robofinist.model.bid.BidStatus
 import org.roborace.lapscounter.robofinist.model.event.Event
@@ -72,6 +74,42 @@ class RobofinistService(
     fun startStage(stageId: Long) {
         robofinistClient.editStage(stageId = stageId, status = StageStatus.FORMING.code)
         robofinistClient.editStage(stageId = stageId, status = StageStatus.IN_PROGRESS.code)
+    }
+
+    fun getQualificationResults(programId: Long, stageId: Long): List<QualificationResult> {
+        val bids = getBids(programId).filter { it.status == BidStatus.PARTICIPATED.code }
+        return bids.map { bid ->
+            val response = robofinistClient.getBidResults(bid.id)
+            val stage = response.data?.programs
+                ?.flatMap { it.programStages ?: emptyList() }
+                ?.find { it.id == stageId.toInt() }
+            
+            val attemptsMap = stage?.results?.attempts ?: emptyMap()
+            
+            fun getAttemptResult(index: Int): AttemptResult {
+                val attempt = attemptsMap[index.toString()]
+                val disqualified = attempt?.disqualification == 1
+                val laps = if (disqualified) null else attempt?.params?.getOrNull(0)?.toInt()
+                val time = if (disqualified) null else attempt?.params?.getOrNull(1)
+                return AttemptResult(laps, time, disqualified)
+            }
+            
+            val attempts = listOf(getAttemptResult(0), getAttemptResult(1), getAttemptResult(2))
+            
+            val bestAttempt = attempts
+                .filter { !it.disqualified && it.laps != null && it.time != null && it.time > 0 }
+                .sortedWith(compareByDescending<AttemptResult> { it.laps }.thenBy { it.time })
+                .firstOrNull()
+            
+            QualificationResult(
+                bidId = bid.id,
+                name = bid.name,
+                best = bestAttempt,
+                attempts = attempts,
+                place = null
+            )
+        }.sortedWith(compareByDescending<QualificationResult> { it.best?.laps ?: 0 }.thenBy(nullsLast()) { it.best?.time })
+         .mapIndexed { index, result -> result.copy(place = index + 1) }
     }
 
     companion object {
