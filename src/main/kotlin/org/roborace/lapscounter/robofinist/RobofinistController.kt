@@ -1,5 +1,6 @@
 package org.roborace.lapscounter.robofinist
 
+import org.roborace.lapscounter.robofinist.model.bid.CreateResultDto
 import org.roborace.lapscounter.robofinist.model.QualificationResult
 import org.roborace.lapscounter.robofinist.model.bid.Bid
 import org.roborace.lapscounter.robofinist.model.event.EventDto
@@ -45,5 +46,13 @@ class RobofinistController(
         @PathVariable programId: Long,
         @PathVariable stageId: Long
     ): List<QualificationResult> = robofinistService.getQualificationResults(programId, stageId)
+
+    @PostMapping("/results")
+    fun createResult(@RequestBody dto: CreateResultDto) = 
+        if (dto.disqualified) {
+            robofinistService.disqualifyResult(dto.stageId, dto.bidId, dto.number)
+        } else {
+            robofinistService.createResult(dto.stageId, dto.bidId, dto.number, dto.laps, dto.time)
+        }
 
 }

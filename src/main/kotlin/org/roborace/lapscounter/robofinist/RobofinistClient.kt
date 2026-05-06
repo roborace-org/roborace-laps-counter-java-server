@@ -8,6 +8,8 @@ import org.roborace.lapscounter.robofinist.model.bid.BidResultRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidResultResponse
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchRequest
 import org.roborace.lapscounter.robofinist.model.bid.BidSearchResponse
+import org.roborace.lapscounter.robofinist.model.bid.ResultCreateRequest
+import org.roborace.lapscounter.robofinist.model.bid.ResultCreateResponse
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchRequest
 import org.roborace.lapscounter.robofinist.model.event.EventsSearchResponse
 import org.roborace.lapscounter.robofinist.model.program.ProgramSearchRequest
@@ -51,6 +53,12 @@ class RobofinistClient(
 
     fun editStage(stageId: Long, status: Int): StageEditResponse =
         execute<StageEditResponse>(StageEditRequest(stageId = stageId, status = status))
+
+    fun createResult(stageId: Int, bidId: Int, number: Int, laps: Int, time: Double): ResultCreateResponse =
+        execute<ResultCreateResponse>(ResultCreateRequest.create(stageId, bidId, number, laps, time))
+
+    fun disqualifyResult(stageId: Int, bidId: Int, number: Int): ResultCreateResponse =
+        execute<ResultCreateResponse>(ResultCreateRequest.disqualify(stageId, bidId, number))
 
     private inline fun <reified T> execute(request: BaseRequest): T {
         try {

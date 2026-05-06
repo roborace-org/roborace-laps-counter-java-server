@@ -76,6 +76,14 @@ class RobofinistService(
         robofinistClient.editStage(stageId = stageId, status = StageStatus.IN_PROGRESS.code)
     }
 
+    fun createResult(stageId: Int, bidId: Int, number: Int, laps: Int, time: Double) {
+        robofinistClient.createResult(stageId = stageId, bidId = bidId, number = number, laps = laps, time = time)
+    }
+
+    fun disqualifyResult(stageId: Int, bidId: Int, number: Int) {
+        robofinistClient.disqualifyResult(stageId = stageId, bidId = bidId, number = number)
+    }
+
     fun getQualificationResults(programId: Long, stageId: Long): List<QualificationResult> {
         val bids = getBids(programId).filter { it.status == BidStatus.PARTICIPATED.code }
         return bids.map { bid ->
